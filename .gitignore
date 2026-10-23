@@ -1,0 +1,19 @@
+# Rendered output
+media/
+*.mp4
+*.mov
+*.gif
+*.webm
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ruff_cache/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
