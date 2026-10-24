@@ -26,14 +26,15 @@ intuitive.
 | --- | --- | --- |
 | Part 0 · The geometry of shape space 1 | video, about 8 min | shape space: bundles, connections, curvature |
 | Part 1 · Diffusion in the right geometry | video, about 5 min | diffusion: stiffness and the metric |
-| Torus flow, flattened | explorable | atlases: why one flat chart is not enough |
+| Atlas · Why one chart is not enough | playable video (prototype), about 2 min | atlases: why one flat chart is not enough |
+| Torus flow, flattened | explorable | atlases: the same argument as a standalone page |
 
 **Videos** are narrated timelines with chapters, scrubbing and frame-by-frame
 export to MP4. **Explorables** are interactive pages to play with directly.
-The torus page only motivates atlases; flow matching and the atlas method
-itself will get their own pieces. The plan is to
-merge both kinds into *playable videos*; see
-[Interactive videos](#interactive-videos-next).
+**Playable videos** combine the two: a narrated video whose live scenes the
+viewer can take over; see [Playable videos](#playable-videos). The atlas
+prototype and the torus page only motivate atlases; flow matching and the atlas
+method itself will get their own pieces.
 
 ## The videos
 
@@ -78,6 +79,18 @@ merge both kinds into *playable videos*; see
 
 The numbers on screen (force constants, κ = 400) are illustrative. Rigorous
 proofs are part of the thesis.
+
+**Atlas · Why one chart is not enough** (prototype, about 2 minutes)
+
+1. **Title.**
+2. **A flow that will not flatten**, one live scene of 100 s. Particles on a
+   torus follow the same dynamics as the torus explorable below: their density p
+   stays fixed while a current makes the cloud circulate. The scene shows the same
+   particles on the torus, on the flat chart with glued edges (16 s), and on a
+   square with reflecting walls, restarted from the glued cloud (46 s). With the
+   current kept, mass piles against the walls; at 70 s the current is dropped
+   and the noise raised, and the walled cloud relaxes back towards p but no
+   longer circulates. At 66 s the viewer is invited to try it themselves.
 
 Each video runs in the browser as an interactive player with chapters, scrubbing
 and narration, and can be exported frame by frame to MP4. Everything is plain
@@ -125,34 +138,48 @@ so it cannot be scrubbed or exported to MP4 yet. The page is kept as it was
 made, apart from three text corrections in its readout table and argument
 columns.
 
-## Interactive videos (next)
+## Playable videos
 
-All videos and explorables will be reworked into *playable videos*. None of
-this is built yet. A playable video will play as a complete narrated film, but
-some scenes will be live: their sliders move on their own while the narration
-demonstrates, and the viewer can take over at any moment.
+A playable video plays as a complete narrated film, but some scenes are live:
+their controls move on their own while the narration demonstrates, and the
+viewer can take over at any moment. The atlas video is the first prototype; the
+other videos and the explorable will be reworked into this format.
 
-- Touching a physics control, such as the noise or the current, pauses the
-  narration. The simulation then runs on from that moment under the viewer's
-  settings. "Back to the video" returns to the narration.
-- View controls, such as rotating the torus, never interrupt.
-- MP4 export always shows the authored performance.
+- **Physics controls** (the noise D, the current j, the wall rule) appear in a
+  strip under the stage. Touching one pauses the narration and starts *explore
+  mode*: the simulation runs on from that exact moment under the viewer's
+  settings. Space pauses and resumes it; "Back to the video" or Esc returns to
+  the narration where it stopped.
+- **View controls** (rotating the torus by dragging it, showing the target
+  density or the particle histogram) never pause anything and survive scrubbing
+  until "Reset view".
+- **Hand-overs** invite the viewer to try something ("Your turn: …"). If the
+  viewer does nothing, the video plays on with the authored demonstration.
+- **Beats** are named moments inside a long live scene, listed as sub-chapters.
+- **MP4 export** always shows the authored performance.
 
-Live simulations will use a fixed time step and a seeded random-number
-generator, so the same moment always gives the same picture in the same browser
-build. Saved snapshots of the simulation will make jumps to any moment fast, so
-scrubbing and MP4 export keep working. The design, measurements of a trial port
-of the torus simulation and the plan are in
-[docs/interactive-video.md](docs/interactive-video.md).
+A live simulation uses a fixed time step and a seeded random-number generator,
+so the same moment always gives the same picture in the same browser build.
+Snapshots every 0.5 s of simulated time make jumps fast once that part has been
+computed; after a far jump into a part not yet computed, the video waits and
+shows "computing the simulation …" until it has caught up. The design, its
+measurements and the plan are in [docs/interactive-video.md](docs/interactive-video.md).
 
 ## Quick start
 
 ```bash
 npm install                      # esbuild (build) and Playwright (tests, export)
-npm run dev                      # http://localhost:5173/?video=part-0 (or part-1), /explorables/torus-flow.html
-npm run build                    # dist/part-0.html, dist/part-1.html: one self-contained file per video; dist/explorables/
-npm test                         # renders every scene of every video (fails on any error) and runs every explorable for 1 s (fails on uncaught exceptions)
+npm run dev                      # http://localhost:5173/?video=part-0 (or part-1, atlas), /explorables/torus-flow.html
+npm run build                    # dist/<id>.html: one self-contained file per video; dist/explorables/
+npm test                         # Node tests of the models, then the smoke test (below)
 ```
+
+The smoke test renders every scene of every video and fails on any error. For
+live scenes it also checks that a frame looks the same however it is reached
+(jumping there, jumping back, or playing up to it) and that every control
+renders at its extremes. It fails if anything under `src/videos` reads the clock
+or unseeded randomness, and it runs every explorable for 1 s (failing on
+uncaught exceptions).
 
 `npm test` needs Playwright's Chromium (`npx playwright install chromium`). For
 a quick smoke run in an installed Google Chrome instead, use
@@ -178,14 +205,17 @@ src/
   app.js                mountVideo(video): timeline, player, heading, export hooks
   main.js               development entry: picks a video from ?video=
   kit.js                everything a scene needs, in one import
-  engine/               timeline, player, recorder, timing helpers, seeded RNG
+  engine/               timeline, player, recorder, timing helpers, seeded RNG;
+                        live scenes: controls, seekable simulations, LiveView (what one viewer sees)
   draw/                 theme, text, shapes, TeX, widgets, plots, molecule view, 3D surfaces
   model/                molecule, camera, rotations, energy, zero-momentum dynamics, data
   videos/
     common/             pieces shared by several videos
     part-0/             meta.json, index.js (the scene list), scenes/, and helpers
     part-1/             the same for Part 1
+    atlas/              the same, plus torusFlow.js (the simulation) and torusViews.js (its drawing)
 explorables/            standalone interactive pages, copied to dist/explorables/ by the build
+tests/                  Node tests of models (node --test)
 docs/                   design notes
 scripts/                dev server, build, smoke test, frame export
 ```
@@ -215,6 +245,12 @@ to the screen; the exporter renders at any resolution.
 (eyebrow and title, faded in and out), and the dip to dark between scenes.
 Set `continues: true` on a scene to flow straight on from the previous one.
 
+**A live scene is a pure function of time and its inputs.** Its controls have
+authored values over time, and its simulation advances in fixed steps from a
+fixed seed. The engine computes the simulation state for time `t` and passes it
+to `draw(ctx, t, { input, state })`, so the frame still depends only on `t`
+unless the viewer takes over.
+
 ## Adding a scene
 
 1. Create `src/videos/part-0/scenes/18-my-scene.js`:
@@ -239,6 +275,46 @@ Set `continues: true` on a scene to flow straight on from the previous one.
    ```
 
 2. Add it to the scene list in `src/videos/part-0/index.js`.
+
+## Adding a live scene
+
+A live scene adds `controls`, a `sim` and optionally `beats`, `handovers` and
+timed narration. `src/videos/atlas/scenes/01-flow.js` is the full example:
+
+```js
+import { defineScene, seg, slider, choice, drag } from '../../../kit.js';
+import { simulation } from '../../../engine/simulation.js';
+
+const sim = simulation({
+  seed: 5, dt: 1 / 300, tick: 1 / 60,      // fixed step; statistics on a fixed tick
+  uses: ['D'],                             // the controls the physics reads (levers)
+  init: (rng) => ({ /* typed arrays */ }),
+  step: (state, input, rng, dt) => { /* advance one step, using only rng for noise */ },
+  onTick: (state, tick) => { /* smoothed statistics, trails */ },
+  events: [[20, (state) => { /* a discrete change at 20 s */ }]],
+});
+
+export default defineScene({
+  name: 'My live scene',
+  duration: 40,
+  narration: [[0, 'First line.'], [20, 'Second line, from 20 s.']],
+  beats: [[20, 'Halfway']],
+  handovers: [{ at: 30, prompt: 'Your turn: …' }],
+  controls: {
+    D: slider('Noise D', { min: 0, max: 1, value: [[0, 0.2], [19.5, 0.2], [20, 0.6]] }), // keyframes
+    show: choice('Show', { a: 'one view', b: 'another' }, { value: 'a', lens: true }),     // a view control
+    view: drag('Drag to rotate', { region: [40, 150, 700, 640] }),                          // stage units
+  },
+  sim,
+  draw(ctx, t, { input, state }) {
+    /* draw from t, input (control values) and state (the simulation at t) */
+  },
+});
+```
+
+Numbers ease from one keyframe to the next like `seg()`, so a sudden change
+needs a holding keyframe just before it. Put the model in its own DOM-free
+module so `tests/` can run it in Node.
 
 ## Adding a video
 
@@ -280,11 +356,13 @@ and an `index.js` that exports `{ ...meta, scenes, posterTime }`. Register it in
 - One scene per file, numbered in playing order; the file's default export is the scene.
 - Times inside a scene are literal seconds, written next to what they animate.
   Named constants are for values used more than once.
-- No state between frames; derive everything from `t`.
+- No state between frames; derive everything from `t` (in a live scene, from `t`,
+  `input` and the `state` the engine passes in).
 - Keep `npm test` green before committing.
 
 ## Recording in the browser
 
 The **Record WebM** button plays the video once at 1× and downloads a WebM
-(when the page is served locally). Pausing stops the recording early. For final
-output prefer `npm run export`, which never drops frames.
+(when the page is served locally). Pausing, or touching a physics control,
+stops the recording early. For final output prefer `npm run export`, which
+never drops frames.
