@@ -1,8 +1,10 @@
 # Interactive videos
 
-Status: design note. Built so far: the standalone explorable `explorables/torus-flow.html`,
-which the build copies to `dist/explorables/` and the smoke test loads. Everything else
-described here (live scenes, levers, lenses, explore mode, snapshots) is planned.
+Status: steps 1 and 2 of the [plan](#plan) are built. The standalone explorable
+`explorables/torus-flow.html` is in the build and the smoke test, and the prototype engine
+(live scenes, levers, lenses, explore mode, snapshots) runs one live scene in the `atlas`
+video; [Prototype results](#prototype-results) records what was measured. Session export,
+talk mode and the other step-3 features are still planned.
 
 ## The question
 
@@ -65,29 +67,36 @@ the authored version.
 
 **Two kinds of control.**
 
-- A *lever* changes the simulated physics: the noise D, the current j or the wall rule.
-  Touching one pauses the narration and starts explore mode (below), in which the
-  simulation runs on under the viewer's settings.
+- A *lever* changes the simulated physics, such as the noise D or the current j. Touching
+  one pauses the narration and starts explore mode (below), in which the simulation runs on
+  under the viewer's settings. Pausing is what keeps the narration true: it would otherwise
+  go on describing physics the viewer has changed.
 - A *lens* changes only the view, such as rotating the torus or showing the target density
-  instead of the particle histogram. A lens never pauses anything. A viewer's lens setting
-  holds until the scene ends or the viewer presses "Reset view"; until then, authored
-  keyframes for that lens are ignored.
+  instead of the particle histogram. It changes nothing the narration claims, so it never
+  pauses anything. A viewer's lens setting holds until the scene ends or the viewer presses
+  "Reset view"; until then, authored keyframes for that lens are ignored.
+- The strip shows the two kinds in separate groups, "Physics · pauses the video" and
+  "View", so the rule is visible rather than surprising.
 
 Authored values are constants or `[time, value]` keyframes. A number eases from one
 keyframe to the next like `seg()`, so a sudden change needs a holding keyframe just before
-it. A choice switches at its keyframe.
+it. A choice switches at its keyframe. The video should play its own controls, so viewers
+see what each one does before they take over; while the video moves a control, the strip
+highlights it.
 
 **Explore mode.**
 
-- It starts when the viewer touches a lever. Let t₀ be that moment.
+- It starts when the viewer touches a lever. Let t₀ be that moment, but no earlier than the
+  scene's `exploreFrom` (the time its content has faded in).
 - Narrative time freezes at t₀, so labels and fades stay put. Dips to dark and header fades
   are skipped while exploring.
 - The simulation keeps running from the exact authored state at t₀, under the viewer's
-  settings. Space pauses and resumes it. This is a new shortcut: the page has only a
-  Play/Pause button.
-- "Back to the video" returns to the narration at t₀ and shows the authored version again;
-  lens settings are kept. Esc does the same outside fullscreen; in fullscreen the browser
-  uses Esc to leave fullscreen first. Scrubbing or a chapter jump also leaves explore mode.
+  settings. If the authored run has not reached t₀ yet (after a far jump), the branch starts
+  once it has, with the "computing" note meanwhile; the page never blocks. Space pauses and
+  resumes it. This is a new shortcut: the page has only a Play/Pause button.
+- "Resume the video", Play or Esc plays the narration on from t₀ with the authored version
+  again; lens settings are kept. In fullscreen the browser uses Esc to leave fullscreen
+  first. Scrubbing or a chapter jump also leaves explore mode, without playing.
 
 **Hand-overs.** A *hand-over* is an authored invitation ("Your turn: …") at a fixed time.
 The player shows the prompt with a "Try it" button. If the viewer does nothing, playback
@@ -107,24 +116,25 @@ A stochastic scene owns a simulation that the engine advances.
   time maps to a step through one rule, `k = Math.floor(t / dt + 1e-6)`, so 30 and 60 fps
   exports see the same states. Viewer changes are stored by step index.
 - **Randomness.** All noise comes from one seeded mulberry32 stream, the generator in
-  `src/engine/random.js`. That generator will gain a way to read and restore its 32-bit
-  state, which is saved with every snapshot.
+  `src/engine/random.js`, whose 32-bit state (`getState`/`setState`) is saved with every
+  snapshot.
 - **Statistics.** Smoothed histograms, lap rates, trails and the sparkline update on a
   fixed 1/60 s tick of simulated time, so their smoothing means the same at any frame rate.
 - **Snapshots.** Every 0.5 s the whole float64 state is copied exactly. Snapshots go into
   one shared, append-only store. The player, the export API and the tests each keep their
   own cursor, so they never disturb each other.
 - **Seeking in the player.** A seek restores the nearest earlier snapshot and replays at
-  most 0.5 s. If the snapshot exists, the seek runs synchronously; about 0.1–0.2 s is
-  acceptable while scrubbing. A far jump into a part not yet computed shows a "computing"
-  note and catches up over the next frames. During playback, the clock waits for the
-  simulation.
+  most 0.5 s. If the snapshot exists, or the cursor is less than 0.5 s behind, the seek runs
+  synchronously. A far jump into a part not yet computed shows a "computing" note and
+  catches up within 10 ms per frame (14 ms while it is catching up). During playback, the
+  clock waits for the simulation.
 - **Seeking through the export API.** `window.video.frame(T)` never shows the note. If T
   lies beyond the computed range, it simulates synchronously up to T, which can block for
   seconds. Export and the smoke test therefore need no change.
 - **Warm-up.** The authored run is computed in small background chunks, but only after the
   viewer presses Play or scrubs. A page driven only through `window.video.frame` never warms
-  up.
+  up. While the player is itself catching up, the warm-up waits, because both would compute
+  the same steps from the same snapshot.
 - **Authored events.** A scene can schedule discrete events, for example "at the walls
   beat, copy the glued cloud into the walled cloud and reset its statistics".
 - **Teleports.** A teleport is a particle leaving one edge of the glued square and
@@ -133,36 +143,43 @@ A stochastic scene owns a simulation that the engine advances.
 
 ## Drawing
 
-- Videos will not use WebGL. The torus is drawn by the existing painter's-algorithm
-  approach in `src/draw/surface.js`, on a coarser mesh (64×24 to 96×36 cells instead of the
-  page's 200×72). A video then needs no new library: it stays one file that loads only
+- Videos do not use WebGL. The atlas video draws the torus with a painter's algorithm of its
+  own (`src/videos/atlas/torusViews.js`): a 96×36 mesh whose geometry and colours are
+  computed once, with only rotation, projection, depth sort and shading per frame. The
+  existing `drawSurface` allocates objects for every vertex on every call, which was too
+  slow for this. A video still needs no new library: it stays one file that loads only
   MathJax and fonts from CDNs, with fallbacks, and it exports headless.
-- Each particle is binned into its mesh cell and drawn right after that cell. This is
-  consistent with the painter's order, not an exact depth test; judge it by eye.
-- The frame rates measured below used a typed-array painter written for the measurement,
-  not the current `drawSurface`, which allocates objects for every vertex on every call.
-  The prototype must measure the code path it ships, at the real canvas size (the player
-  uses up to 2× device pixels). If it is too slow, either adopt the typed-array painter in
-  `src/draw/`, or cap the canvas resolution during live scenes.
+- Each particle is binned into its mesh cell and drawn right after that cell. Seams, trails
+  and tracer heads are drawn in depth layers inside the same loop, so the near side of the
+  torus hides them at any viewing angle.
+- The repository's camera has its depth axis pointing away from the viewer, so the torus is
+  drawn as the mirror image of the WebGL page (Part 0 uses the same convention).
 
 ## Controls on the page
 
 - The player builds an HTML control strip (sliders and segmented buttons) from the scene's
   `controls`. Fullscreen covers a wrapper that includes the strip; the canvas height then
-  leaves room for the strip.
-- Keys go to a focused control. Space on a slider or button must not toggle playback, so
-  shortcuts check whether focus is inside the strip.
+  leaves room for the strip's measured height.
+- Enter and arrow keys go to a focused control. Space goes to a button only when it was
+  focused from the keyboard, so that it presses the button. Otherwise Space keeps its player
+  meaning (play/pause, or pause the explore simulation), also right after a slider or button
+  was clicked with the mouse, which leaves the focus on it.
+- A viewer's lens settings hold until the scene ends or "Reset view".
 - Dragging on the canvas is mapped to stage units (1600×900) and feeds `drag` lenses. Live
   scenes set `touch-action` on the canvas so that dragging does not scroll the page on a
   phone.
 - Everything an MP4 viewer needs is drawn on the canvas by the scene: the values of D and j,
-  the wall rule, the readouts and the sparkline.
+  the readouts and the sparkline.
 - The export API changes from `frame(T, width, height)` to `frame(T, width, { height, view })`.
   No caller in the repository passes a height today. Without `view` it renders the
   authored version.
 - Entering explore mode stops an in-browser WebM recording, as pausing does today.
 
 ## Scene sketch
+
+The sketch below was written before building. The built scene,
+`src/videos/atlas/scenes/01-flow.js`, follows it but differs in details: the camera, the
+restart at 46 s (`restartWalled`), `exploreFrom`, and the narration.
 
 ```js
 export default defineScene({
@@ -209,7 +226,7 @@ no scene reads. It becomes `{ input, state }`, and scenes without controls recei
 |---|---|
 | Play / Pause button | the player's transport; Space in explore mode |
 | Noise D and current j sliders | levers |
-| Walls: keep the rule / drop the current | lever (choice) |
+| Walls: keep the rule / drop the current | left out: the video is about the pile-up, not about recovering p without the current |
 | Square shows target p / histogram | lens (choice) |
 | Drag to rotate; slow auto-rotation | `drag` lens; yaw grows by 0.15 rad/s |
 | Resample from p | later: an explore-only action that reseeds |
@@ -228,16 +245,19 @@ Port specification:
   dt = 1/300. The smoothing factors 0.04 (histogram) and 0.985 (lap rate) apply per 1/60 s
   tick. Trails keep 2.5 s. The sparkline samples every 3 ticks and keeps 30 s. A teleport
   marker lives 1.1 s. The rotation of 0.0025 rad per frame becomes 0.15 rad/s.
-- **Model checks.** The page steps with the display's frame time, so its readouts depend on
-  the refresh rate. The port is checked against theory instead, at a fixed seed with
-  D = 0.15 and j = 0.5:
-  - the glued lap rate, averaged over a stated window after a stated burn-in, is close to
-    j/2π ≈ 0.080;
-  - the glued distance to p stays near the sampling floor, defined as the distance of an
-    independent 3000-point sample of p smoothed the same way (about 0.06);
-  - in drop mode, the walled distance relaxes to the same floor and the lap rate to 0.
-  The window, burn-in and tolerances are fixed from the floor measurement before the port
-  is run.
+- **Model checks** (`tests/torus-flow.test.mjs`). The page steps with the display's frame
+  time, so its readouts depend on the refresh rate. The port is checked against theory
+  instead, with thresholds fixed before it was first run: seed 5, D = 0.15, j = 0.5, a 10 s
+  burn-in and a 30 s window, lap rates from the net meridian crossings over the window.
+  - The glued lap rate is within 10 % of j/2π ≈ 0.080.
+  - The glued mean distance to p is at most TV₀ + 0.02, where TV₀ comes from the same run
+    with j = 0: a reversible process with stationary law p and the same noise, particle
+    count and smoothing. (An independent 3000-point sample of p would understate this
+    floor, because the particles move only a little from one tick to the next.)
+  - With the rule kept, the walled distance ends above 0.5 and its lap rate stays within
+    ±0.005; with the current dropped from the start, its mean distance is at most
+    TV₀ + 0.02 and its lap rate within ±0.005.
+  - Re-runs, and seeks through snapshots across a scheduled event, are bit-identical.
 
 Distance to p is the total-variation distance between the smoothed 24×24 particle
 histogram and p on the same bins: 0 means identical, 1 means no overlap. What a storyboard
@@ -307,38 +327,87 @@ pinned Chromium. A *frame* below means 1/60 s of simulated time: 5 steps of both
 - **Random-number period.** mulberry32 repeats after 2³² draws: about 10 minutes of
   simulated time at this draw rate.
 
+## Prototype results
+
+The atlas video's live scene, measured on an Apple M4 Pro with Node 24 and headless Google
+Chrome 155 (driven by Playwright 1.64 through `PLAYWRIGHT_CHANNEL=chrome`; Playwright's own
+pinned Chromium was not installed). Firefox, Safari, slower machines and phones were not
+measured.
+
+| Check | Result |
+|---|---|
+| Existing videos unchanged | all 102 checked frames of Part 0 and Part 1 (start, middle and end of every scene, offline) are byte-identical to `main` |
+| Model against the page | positions, histograms, readouts, trails, sparkline and teleport markers bit-identical over 60 s with changing D, j and wall rule; only the three deliberate changes (seeded noise, fixed step, fixed tick) were applied |
+| Model checks (`node --test`) | glued lap rate 0.0798 against j/2π = 0.0796; glued mean TV 0.062 against 0.067 for the reversible reference (j = 0); walled TV 0.95 after the pile-up; walled with the current dropped: mean TV 0.068 and lap rate 0.0006 |
+| Seeking does not change the picture (smoke test) | the frame in the middle of the live scene is identical whether jumped to cold, jumped back to, or played up to in uneven steps |
+| Playback | 60 fps, about 5 ms of JavaScript per frame (95th percentile 6 ms), at canvas widths of 1238 and 2476 pixels |
+| Explore mode | about 5 ms per frame |
+| Seeks once computed | worst frame 19–24 ms |
+| Far jump into an uncomputed part | 4–5 s until the picture has caught up 20–30 s into the scene, with the "computing" note; the page stays responsive (a lever touch returns in under 1 ms) |
+| Export | two full exports at 30 fps (3210 frames) identical frame for frame, and the two MP4 files byte-identical; the 30 fps frames equal the 60 fps frames at the same times (121 of 121) |
+| Interaction | 26 scripted checks in Chrome pass: entering and resuming from explore mode, Space and Esc, the video moving and highlighting its own controls, lens behaviour, the hand-over, dragging, beats, narration cues; fullscreen leaves room for the strip at 1280×800, 1920×1080 and 390×844 |
+
+Decisions made while building, and known limits:
+
+- **Teleport markers.** The ring holds 256 markers, not 64: up to 155 were measured alive at
+  once (86 at the page's defaults).
+- **Restarting the walled cloud** at 46 s also clears its sparkline history, which nobody
+  saw.
+- **Controls.** Every control is either a lever (listed in the simulation's `uses`) or a
+  lens; `defineScene` rejects anything else.
+- **Noise.** The two clouds keep independent noise, as on the page.
+- **Snapshots** hold the full state, about 200 kB each, so about 30 MB for the 74 s scene.
+- **After a first viewing** the scene was shortened from 100 s to 74 s and refocused on the
+  topology: the wall-rule control and the phase where dropping the current let the walled
+  cloud relax back to p are gone. The video now plays its own controls (noise, current,
+  histogram) before the walls appear, "Resume the video" plays on instead of only returning,
+  and the strip labels which controls pause the video.
+- **A weak model check.** The walled lap rate with the current kept must stay below 0.005.
+  It passes at seed 5 (0.0048) but would fail at 2 of 7 seeds, because on the walled square
+  that number only measures the pile-up still finishing. The threshold was fixed before the
+  port was run and is kept; a better check is listed under Rework.
+- **Wording.** After a scientific review the glued square is not called a chart, the
+  readouts call 0.06 a noise floor rather than a sampling floor, and a footnote explains
+  that the walled lap number only counts mass moving between the square's halves.
+
 ## Plan
 
 1. **Now (done).** The page lives in `explorables/torus-flow.html`, unchanged apart from
    three text corrections in its readout table and argument columns. The build copies it
    to `dist/explorables/`, and the smoke test fails if it throws. Share it by sending the
    built file (the 3D view needs a network connection for three.js) or a screen recording.
-2. **Prototype.** One live scene, in a new `atlas` video.
+2. **Prototype (done).** One live scene, in a new `atlas` video.
    - Engine: levers, one drag lens, explore mode, keyframed inputs evaluated per step,
      snapshots, a generator with saveable state, beats and a hand-over prompt.
    - The torus geometry stays local to the new video; Part 0 is not touched.
    - Deferred: session export, "copy as keyframes", crossfades, talk mode, subtitles.
-   - Acceptance: existing videos render identical frames; the new tests pass; the port
-     passes the model checks; at least 60 fps while playing in Chromium at the real canvas
-     size; seeks within about 150 ms once warm-up is done; two MP4 exports are identical.
+   - Acceptance, all met (see [Prototype results](#prototype-results)): existing videos
+     render identical frames; the new tests pass; the port passes the model checks; at least
+     60 fps while playing in Chromium at the real canvas size; seeks within about 150 ms
+     once warm-up is done; two MP4 exports are identical.
 3. **Rework.** The deferred features; a static scene with the page's three arguments and
    its equation; an atlas payoff scene; lenses and levers on existing scenes (the Part 0
    torus scenes, the connection tilt, the holonomy twist); live scenes for flow-matching
-   transport and for chart transitions.
+   transport and for chart transitions. Also: lean snapshots, a faster simulation step
+   (the Gaussian draws dominate its cost) to shorten the catch-up after a far jump, and a
+   walled-square check that measures circulation rather than the end of the pile-up.
 
 ## Open questions
 
 - **Shared noise.** Should both clouds use the same noise? With shared noise they move in
   lockstep until a particle meets a wall, so only the boundary rule differs. With
-  independent noise, as on the page, they also differ by chance. Decide before the
-  prototype, because it fixes the order of random draws.
-- **Snapshot layout.** Full snapshots (about 22 MB per simulated minute) or lean ones
-  (about 14 MB)? Choose lean if a scene's snapshots would not fit a modest memory budget on
-  a laptop.
+  independent noise, as on the page and in the prototype, they also differ by chance.
+  Changing it changes the order of random draws, so every frame of the live scene.
+- **Snapshot layout.** Full snapshots (about 24 MB per simulated minute in the prototype)
+  or lean ones (about 14 MB)? Choose lean if a scene's snapshots would not fit a modest
+  memory budget on a laptop or phone.
 - **Long exploration** is limited by the random-number period. Cap explore sessions, or use
   a generator with a longer period?
 - **Look of the 3D view.** Is the painter's-algorithm torus good enough next to the WebGL
-  page?
+  page? It is drawn as the page's mirror image (see Drawing); mirroring the world would
+  change every torus in the repository.
+- **Busy glued square.** A tracer hovering at an edge leaves stacks of teleport markers,
+  as on the page. Thin them out?
 - **Atlas payoff scene.** The walled square is a simply connected piece of ℝ² with no-flux
   walls, so it cannot carry the winding current. In an atlas, overlapping charts replace
   the single glued square: a particle is re-expressed in the next chart while it is inside
@@ -354,5 +423,5 @@ pinned Chromium. A *frame* below means 1/60 s of simulated time: 5 steps of both
     sets. The argument has not been checked against a written source.
   - The scene should say which chart layout it shows and use the terms of the thesis's
     atlas library (atlasgeo).
-- **Keeping settings.** Should a viewer's lever settings survive "Back to the video"? Not in
+- **Keeping settings.** Should a viewer's lever settings survive "Resume the video"? Not in
   the first version, because the narration could then contradict the screen.

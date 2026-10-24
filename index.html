@@ -34,9 +34,23 @@
       <nav class="video-nav" id="video-nav" aria-label="Videos" hidden></nav>
     </header>
 
-    <div class="stage" id="stage">
-      <canvas id="stage-canvas" width="1600" height="900" aria-label="Animated explainer"></canvas>
-      <button id="poster-play" class="poster-play" type="button">▶&nbsp; Play from the start</button>
+    <div class="screen" id="screen">
+      <div class="stage" id="stage">
+        <canvas id="stage-canvas" width="1600" height="900" aria-label="Animated explainer"></canvas>
+        <button id="poster-play" class="poster-play" type="button">▶&nbsp; Play from the start</button>
+        <div class="handover" id="handover" role="status" hidden>
+          <p id="handover-text"></p>
+          <button id="handover-try" type="button">Try it</button>
+        </div>
+      </div>
+      <div class="live-strip" id="live-strip" hidden>
+        <div class="live-controls" id="live-controls"></div>
+        <div class="explore-bar" id="explore-bar" hidden>
+          <span id="explore-status"></span>
+          <button id="explore-pause" type="button">Pause simulation</button>
+          <button id="explore-back" type="button">Resume the video</button>
+        </div>
+      </div>
     </div>
 
     <div class="transport">
@@ -61,7 +75,7 @@
       <p id="narration"></p>
     </section>
     <ol class="chapters" id="chapters"></ol>
-    <p class="hint">Space: play / pause · ← →: seek 5 s · [ ]: previous / next chapter · F: fullscreen</p>
+    <p class="hint">Space: play / pause (while exploring: pause the simulation) · ← →: seek 5 s · [ ]: previous / next chapter · F: fullscreen · Esc: back to the video</p>
   </main>
 
   <script type="module" src="./src/main.js"></script>

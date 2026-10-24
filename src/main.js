@@ -4,8 +4,9 @@
 import { mountVideo } from './app.js';
 import part0 from './videos/part-0/index.js';
 import part1 from './videos/part-1/index.js';
+import atlas from './videos/atlas/index.js';
 
-const videos = [part0, part1];
+const videos = [part0, part1, atlas];
 const requested = new URLSearchParams(location.search).get('video');
 const video = videos.find((v) => v.id === requested) ?? videos[0];
 mountVideo(video);

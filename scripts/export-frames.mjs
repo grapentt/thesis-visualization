@@ -34,7 +34,7 @@ try {
 
 const fps = Number(args.fps);
 const width = Number(args.width);
-const browser = await chromium.launch();
+const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL });
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 page.on('pageerror', (err) => console.error('page error:', err.message));
 await page.goto(`file://${fileURLToPath(new URL(`../dist/${args.video}.html`, import.meta.url))}`);

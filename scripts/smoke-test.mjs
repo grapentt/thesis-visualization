@@ -1,10 +1,13 @@
 // Render the start, middle and end of every scene of every built video in a
 // headless browser and fail if any scene throws or a page logs an error.
+// Live scenes must also draw the same frame however it is reached, and render
+// every lever at its extremes. Nothing under src/videos may read the clock or
+// unseeded randomness.
 // Built explorables are loaded and run for a second; they fail only on uncaught errors.
 // Usage: npm run build && npm test
 //        PLAYWRIGHT_CHANNEL=chrome npm test   (use the installed Google Chrome instead of Playwright's Chromium)
 
-import { readdir } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 let chromium;
@@ -38,9 +41,43 @@ for (const file of pages) {
     for (const f of [0.01, 0.5, 0.99]) {
       await tab.evaluate((T) => window.video.frame(T, 640), scene.start + f * scene.duration);
     }
+    if (scene.live) errors.push(...(await checkLiveScene(tab, scene)).map((e) => `${file}: ${scene.name}: ${e}`));
   }
   sceneCount += scenes.length;
   await tab.close();
+}
+
+/** Seeking must not change a live scene's frame, and every control value must render. */
+async function checkLiveScene(tab, scene) {
+  return tab.evaluate(({ start, duration, controls }) => {
+    const problems = [];
+    const mid = start + 0.5 * duration;
+    const shot = (T, options) => window.video.frame(T, 320, options);
+    window.video.reset();
+    const cold = shot(mid);
+    shot(start + 0.99 * duration);
+    if (shot(mid) !== cold) problems.push('jumping back to the middle drew a different frame');
+    window.video.reset();
+    for (let T = start; T < mid; T += 0.37) shot(T); // uneven steps, played in order
+    if (shot(mid) !== cold) problems.push('playing up to the middle drew a different frame than jumping there');
+    for (const c of controls) {
+      const values = c.kind === 'slider' ? [c.min, c.max] : c.options ?? [];
+      for (const value of values) shot(start + 1.5, { view: c.lens ? { lenses: { [c.key]: value } } : { levers: { [c.key]: value } } });
+    }
+    return problems;
+  }, scene);
+}
+
+// scenes must be functions of time: no clock and no unseeded randomness in the video sources
+async function sourceFiles(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const nested = await Promise.all(entries.map((e) => (e.isDirectory() ? sourceFiles(new URL(`${e.name}/`, dir)) : [new URL(e.name, dir)])));
+  return nested.flat().filter((url) => url.pathname.endsWith('.js'));
+}
+for (const url of await sourceFiles(new URL('../src/videos/', import.meta.url))) {
+  const source = await readFile(url, 'utf8');
+  const found = source.match(/Math\.random|Date\.now|performance\.now/);
+  if (found) errors.push(`${fileURLToPath(url)}: uses ${found[0]}`);
 }
 
 // console errors are not counted here: offline, three.js and fonts fail to load and the page falls back

@@ -20,5 +20,13 @@ export function createRng(seed) {
     return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
   };
 
-  return { uniform, gauss };
+  return {
+    uniform,
+    gauss,
+    /** The whole generator state: save it with a snapshot to continue the stream exactly. */
+    getState: () => a,
+    setState: (state) => {
+      a = state | 0;
+    },
+  };
 }
