@@ -67,17 +67,22 @@ the authored version.
 
 **Two kinds of control.**
 
-- A *lever* changes the simulated physics: the noise D, the current j or the wall rule.
-  Touching one pauses the narration and starts explore mode (below), in which the
-  simulation runs on under the viewer's settings.
+- A *lever* changes the simulated physics, such as the noise D or the current j. Touching
+  one pauses the narration and starts explore mode (below), in which the simulation runs on
+  under the viewer's settings. Pausing is what keeps the narration true: it would otherwise
+  go on describing physics the viewer has changed.
 - A *lens* changes only the view, such as rotating the torus or showing the target density
-  instead of the particle histogram. A lens never pauses anything. A viewer's lens setting
-  holds until the scene ends or the viewer presses "Reset view"; until then, authored
-  keyframes for that lens are ignored.
+  instead of the particle histogram. It changes nothing the narration claims, so it never
+  pauses anything. A viewer's lens setting holds until the scene ends or the viewer presses
+  "Reset view"; until then, authored keyframes for that lens are ignored.
+- The strip shows the two kinds in separate groups, "Physics · pauses the video" and
+  "View", so the rule is visible rather than surprising.
 
 Authored values are constants or `[time, value]` keyframes. A number eases from one
 keyframe to the next like `seg()`, so a sudden change needs a holding keyframe just before
-it. A choice switches at its keyframe.
+it. A choice switches at its keyframe. The video should play its own controls, so viewers
+see what each one does before they take over; while the video moves a control, the strip
+highlights it.
 
 **Explore mode.**
 
@@ -89,9 +94,9 @@ it. A choice switches at its keyframe.
   settings. If the authored run has not reached t₀ yet (after a far jump), the branch starts
   once it has, with the "computing" note meanwhile; the page never blocks. Space pauses and
   resumes it. This is a new shortcut: the page has only a Play/Pause button.
-- "Back to the video" returns to the narration at t₀ and shows the authored version again;
-  lens settings are kept. Esc does the same outside fullscreen; in fullscreen the browser
-  uses Esc to leave fullscreen first. Scrubbing or a chapter jump also leaves explore mode.
+- "Resume the video", Play or Esc plays the narration on from t₀ with the authored version
+  again; lens settings are kept. In fullscreen the browser uses Esc to leave fullscreen
+  first. Scrubbing or a chapter jump also leaves explore mode, without playing.
 
 **Hand-overs.** A *hand-over* is an authored invitation ("Your turn: …") at a fixed time.
 The player shows the prompt with a "Try it" button. If the viewer does nothing, playback
@@ -164,7 +169,7 @@ A stochastic scene owns a simulation that the engine advances.
   scenes set `touch-action` on the canvas so that dragging does not scroll the page on a
   phone.
 - Everything an MP4 viewer needs is drawn on the canvas by the scene: the values of D and j,
-  the wall rule, the readouts and the sparkline.
+  the readouts and the sparkline.
 - The export API changes from `frame(T, width, height)` to `frame(T, width, { height, view })`.
   No caller in the repository passes a height today. Without `view` it renders the
   authored version.
@@ -221,7 +226,7 @@ no scene reads. It becomes `{ input, state }`, and scenes without controls recei
 |---|---|
 | Play / Pause button | the player's transport; Space in explore mode |
 | Noise D and current j sliders | levers |
-| Walls: keep the rule / drop the current | lever (choice) |
+| Walls: keep the rule / drop the current | left out: the video is about the pile-up, not about recovering p without the current |
 | Square shows target p / histogram | lens (choice) |
 | Drag to rotate; slow auto-rotation | `drag` lens; yaw grows by 0.15 rad/s |
 | Resample from p | later: an explore-only action that reseeds |
@@ -340,7 +345,7 @@ measured.
 | Seeks once computed | worst frame 19–24 ms |
 | Far jump into an uncomputed part | 4–5 s until the picture has caught up 20–30 s into the scene, with the "computing" note; the page stays responsive (a lever touch returns in under 1 ms) |
 | Export | two full exports at 30 fps (3210 frames) identical frame for frame, and the two MP4 files byte-identical; the 30 fps frames equal the 60 fps frames at the same times (121 of 121) |
-| Interaction | 24 scripted checks in Chrome pass: entering and leaving explore mode, Space and Esc, lens behaviour, the hand-over, dragging, beats, narration cues; fullscreen leaves room for the strip at 1280×800, 1920×1080 and 390×844 |
+| Interaction | 26 scripted checks in Chrome pass: entering and resuming from explore mode, Space and Esc, the video moving and highlighting its own controls, lens behaviour, the hand-over, dragging, beats, narration cues; fullscreen leaves room for the strip at 1280×800, 1920×1080 and 390×844 |
 
 Decisions made while building, and known limits:
 
@@ -351,15 +356,19 @@ Decisions made while building, and known limits:
 - **Controls.** Every control is either a lever (listed in the simulation's `uses`) or a
   lens; `defineScene` rejects anything else.
 - **Noise.** The two clouds keep independent noise, as on the page.
-- **Snapshots** hold the full state, about 200 kB each, so about 40 MB for the 100 s scene.
+- **Snapshots** hold the full state, about 200 kB each, so about 30 MB for the 74 s scene.
+- **After a first viewing** the scene was shortened from 100 s to 74 s and refocused on the
+  topology: the wall-rule control and the phase where dropping the current let the walled
+  cloud relax back to p are gone. The video now plays its own controls (noise, current,
+  histogram) before the walls appear, "Resume the video" plays on instead of only returning,
+  and the strip labels which controls pause the video.
 - **A weak model check.** The walled lap rate with the current kept must stay below 0.005.
   It passes at seed 5 (0.0048) but would fail at 2 of 7 seeds, because on the walled square
   that number only measures the pile-up still finishing. The threshold was fixed before the
   port was run and is kept; a better check is listed under Rework.
-- **Wording.** After a scientific review the narration says that a flat square keeps the
-  density but never the flow, the readouts call 0.06 a noise floor rather than a sampling
-  floor, and a footnote explains that the walled lap number only counts mass moving between
-  the square's halves.
+- **Wording.** After a scientific review the glued square is not called a chart, the
+  readouts call 0.06 a noise floor rather than a sampling floor, and a footnote explains
+  that the walled lap number only counts mass moving between the square's halves.
 
 ## Plan
 
@@ -414,5 +423,5 @@ Decisions made while building, and known limits:
     sets. The argument has not been checked against a written source.
   - The scene should say which chart layout it shows and use the terms of the thesis's
     atlas library (atlasgeo).
-- **Keeping settings.** Should a viewer's lever settings survive "Back to the video"? Not in
+- **Keeping settings.** Should a viewer's lever settings survive "Resume the video"? Not in
   the first version, because the narration could then contradict the screen.

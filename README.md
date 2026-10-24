@@ -26,7 +26,7 @@ intuitive.
 | --- | --- | --- |
 | Part 0 · The geometry of shape space 1 | video, about 8 min | shape space: bundles, connections, curvature |
 | Part 1 · Diffusion in the right geometry | video, about 5 min | diffusion: stiffness and the metric |
-| Atlas · Why one chart is not enough | playable video (prototype), about 2 min | atlases: why one flat chart is not enough |
+| Atlas · Why one chart is not enough | playable video (prototype), about 1.5 min | atlases: why one flat chart is not enough |
 | Torus flow, flattened | explorable | atlases: the same argument as a standalone page |
 
 **Videos** are narrated timelines with chapters, scrubbing and frame-by-frame
@@ -80,17 +80,19 @@ method itself will get their own pieces.
 The numbers on screen (force constants, κ = 400) are illustrative. Rigorous
 proofs are part of the thesis.
 
-**Atlas · Why one chart is not enough** (prototype, about 2 minutes)
+**Atlas · Why one chart is not enough** (prototype, about 1.5 minutes)
 
 1. **Title.**
-2. **A flow that will not flatten**, one live scene of 100 s. Particles on a
+2. **A flow that will not flatten**, one live scene of 74 s. Particles on a
    torus follow the same dynamics as the torus explorable below: their density p
-   stays fixed while a current makes the cloud circulate. The scene shows the same
-   particles on the torus, on the flat chart with glued edges (16 s), and on a
-   square with reflecting walls, restarted from the glued cloud (46 s). With the
-   current kept, mass piles against the walls; at 70 s the current is dropped
-   and the noise raised, and the walled cloud relaxes back towards p but no
-   longer circulates. At 66 s the viewer is invited to try it themselves.
+   stays fixed while a current makes the cloud circulate. The video plays its own
+   controls to show what they do: more noise leaves the density at p (8 s); the
+   torus is cut open into a square with glued edges (14 s); switching the current
+   off stops the laps and turning it up speeds them up (30–44 s); the squares
+   switch to the particle histogram (42 s). Then the square gets reflecting walls
+   instead of glued edges (46 s): mass piles against the walls and cannot go
+   round, because a flat square has no hole to go around. At 61 s the viewer is
+   invited to try it themselves.
 
 Each video runs in the browser as an interactive player with chapters, scrubbing
 and narration, and can be exported frame by frame to MP4. Everything is plain
@@ -145,14 +147,18 @@ their controls move on their own while the narration demonstrates, and the
 viewer can take over at any moment. The atlas video is the first prototype; the
 other videos and the explorable will be reworked into this format.
 
-- **Physics controls** (the noise D, the current j, the wall rule) appear in a
-  strip under the stage. Touching one pauses the narration and starts *explore
-  mode*: the simulation runs on from that exact moment under the viewer's
-  settings. Space pauses and resumes it; "Back to the video" or Esc returns to
-  the narration where it stopped.
+- **Physics controls** (the noise D, the current j) appear in the strip under
+  the stage, in a group labelled "Physics · pauses the video". Touching one
+  pauses the narration and starts *explore mode*: the simulation runs on from
+  that exact moment under the viewer's settings, so the narration never talks
+  over physics the viewer has changed. Space pauses and resumes the simulation;
+  "Resume the video", Play or Esc plays the narration on from where it stopped.
 - **View controls** (rotating the torus by dragging it, showing the target
-  density or the particle histogram) never pause anything and survive scrubbing
-  until "Reset view".
+  density or the particle histogram), in the "View" group, change nothing the
+  narration claims, so they never pause anything. They survive scrubbing within
+  the scene, until "Reset view".
+- While the video itself moves a control, that control is highlighted, so the
+  viewer sees what each one does.
 - **Hand-overs** invite the viewer to try something ("Your turn: …"). If the
   viewer does nothing, the video plays on with the authored demonstration.
 - **Beats** are named moments inside a long live scene, listed as sub-chapters.
