@@ -3,6 +3,7 @@
 
 export { defineScene, STAGE } from './engine/timeline.js';
 export * from './engine/timing.js';
+export { slider, choice, drag } from './engine/controls.js';
 
 export { color, axisColor, axisName, font, type } from './draw/theme.js';
 export { rgba, mix, hexToRgb } from './draw/color.js';
