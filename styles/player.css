@@ -1,0 +1,250 @@
+/* Player page: one dark screening-room stage (16:9 canvas), transport bar,
+   narration and chapter list. Stage colours live in src/draw/theme.js. */
+
+:root {
+  --bg: #0a0f1a;
+  --stage: #0d1321;
+  --panel: #141c2e;
+  --line: #28344d;
+  --ink: #ece8de;
+  --muted: #8a96ad;
+  --gold: #f2cf63;
+  --display: "Spectral", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--sans);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 em {
+  color: var(--gold);
+}
+
+.meta {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.video-nav {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.video-nav a {
+  font: 500 0.75rem var(--mono);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3em 0.8em;
+  text-decoration: none;
+}
+
+.video-nav a[aria-current='page'] {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+/* ---- stage */
+.stage {
+  position: relative;
+  background: var(--stage);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.stage canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.stage:fullscreen {
+  border: 0;
+  border-radius: 0;
+  display: grid;
+  place-items: center;
+}
+
+.stage:fullscreen canvas {
+  width: min(100vw, calc(100vh * 16 / 9));
+}
+
+.poster-play {
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  transform: translateX(-50%);
+  font: 500 1rem var(--sans);
+  color: var(--stage);
+  background: var(--gold);
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7em 1.6em;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---- transport */
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.transport button,
+.transport select {
+  font: 500 0.85rem var(--sans);
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.45em 0.85em;
+  cursor: pointer;
+  min-height: 36px;
+}
+
+.transport button:hover,
+.transport select:hover {
+  border-color: var(--muted);
+}
+
+.transport button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+#play {
+  min-width: 5.2em;
+  background: var(--gold);
+  color: var(--stage);
+  border-color: var(--gold);
+}
+
+input[type="range"] {
+  flex: 1 1 200px;
+  min-width: 0;
+  accent-color: var(--gold);
+}
+
+.time {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 0.8rem;
+  min-width: 7.5em;
+  text-align: center;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ---- narration and chapters */
+.narration {
+  display: grid;
+  gap: 4px;
+  max-width: 72ch;
+}
+
+.narration span {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.narration p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  min-height: 3.1em;
+}
+
+.chapters {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chapters button {
+  font: 400 0.78rem var(--sans);
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35em 0.8em;
+  cursor: pointer;
+}
+
+.chapters button b {
+  font-family: var(--mono);
+  font-weight: 500;
+  margin-right: 0.4em;
+}
+
+.chapters button.on,
+.chapters button.on b {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
