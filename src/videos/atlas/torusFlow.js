@@ -209,15 +209,15 @@ function stepCloud(cloud, glued, useJ, { D, j }, rng, dt, time) {
 }
 
 /**
- * One step of both clouds, glued first. The glued cloud always carries the current;
- * the walled one only while walls === 'keep'. Time advances first, so teleports carry the
+ * One step of both clouds, glued first. The glued cloud always carries the current; the
+ * walled one too, unless walls === 'drop'. Time advances first, so teleports carry the
  * time at the end of the step, as on the page.
- * @param {{ D: number, j: number, walls: 'keep' | 'drop' }} input
+ * @param {{ D: number, j: number, walls?: 'keep' | 'drop' }} input
  */
 export function stepFlow(state, input, rng, dt) {
   state.time += dt;
   stepCloud(state.glued, true, true, input, rng, dt, state.time);
-  stepCloud(state.walled, false, input.walls === 'keep', input, rng, dt, state.time);
+  stepCloud(state.walled, false, input.walls !== 'drop', input, rng, dt, state.time);
 }
 
 const binCount = new Float64Array(B * B);
@@ -268,14 +268,17 @@ export function restartWalled(state) {
   for (let s = 1; s < state.spark.length; s += 2) state.spark[s] = NaN;
 }
 
-/** The seekable simulation of both clouds; `events` are [time, (state) => void] pairs. */
-export function flowSimulation({ seed = 5, events = [] } = {}) {
+/**
+ * The seekable simulation of both clouds; `events` are [time, (state) => void] pairs and `uses`
+ * the inputs a scene provides as controls (without 'walls', the walled cloud keeps the current).
+ */
+export function flowSimulation({ seed = 5, events = [], uses = ['D', 'j', 'walls'] } = {}) {
   return simulation({
     seed,
     dt: DT,
     tick: TICK,
     snapshotEvery: 0.5,
-    uses: ['D', 'j', 'walls'],
+    uses,
     init: createFlow,
     step: stepFlow,
     onTick: updateStats,
