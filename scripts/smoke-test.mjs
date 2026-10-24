@@ -1,6 +1,8 @@
 // Render the start, middle and end of every scene of every built video in a
 // headless browser and fail if any scene throws or a page logs an error.
+// Built explorables are loaded and run for a second; they fail only on uncaught errors.
 // Usage: npm run build && npm test
+//        PLAYWRIGHT_CHANNEL=chrome npm test   (use the installed Google Chrome instead of Playwright's Chromium)
 
 import { readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -19,7 +21,7 @@ if (!pages.length) {
   console.error('No built videos in dist/. Run npm run build first.');
   process.exit(1);
 }
-const browser = await chromium.launch();
+const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL });
 const errors = [];
 let sceneCount = 0;
 for (const file of pages) {
@@ -40,10 +42,26 @@ for (const file of pages) {
   sceneCount += scenes.length;
   await tab.close();
 }
+
+// console errors are not counted here: offline, three.js and fonts fail to load and the page falls back
+const explorableDir = new URL('explorables/', dist);
+const explorables = (await readdir(explorableDir).catch(() => [])).filter((f) => f.endsWith('.html'));
+for (const file of explorables) {
+  const tab = await browser.newPage();
+  tab.on('pageerror', (err) => errors.push(`explorables/${file}: ${err.message}`));
+  try {
+    await tab.goto(`file://${fileURLToPath(new URL(file, explorableDir))}`, { timeout: 15_000 });
+    await tab.waitForTimeout(1000);
+  } catch (err) {
+    errors.push(`explorables/${file}: ${err.message}`);
+  }
+  await tab.close();
+}
 await browser.close();
 
 if (errors.length) {
   console.error(`✗ ${errors.length} error(s):\n  ${errors.join('\n  ')}`);
   process.exit(1);
 }
-console.log(`✓ ${pages.length} videos, ${sceneCount} scenes rendered without errors`);
+const explorableCount = `${explorables.length} explorable${explorables.length === 1 ? '' : 's'}`;
+console.log(`✓ ${pages.length} videos (${sceneCount} scenes) and ${explorableCount} ran without errors`);

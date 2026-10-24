@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torus Flow, Flattened</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lab-notebook page. Figures sit on dark "plates" (fixed, theme-independent),
+   prose and readouts follow the page theme. Two figure rows, then the argument. */
+:root{
+  --bg:#f2f3f6; --fg:#161922; --muted:#596072; --rule:#d6d9e1; --card:#ffffff;
+  --accent:#c2410c; --accent-fg:#ffffff;
+  --plate:#0b0d13; --plate-fg:#dde0ea; --plate-muted:#80869a;
+  --seamA:#ff4fd8; --seamB:#f2f2f2; --tracer:#ff6a3d;
+  --s-glued:#0f8f7e; --s-walled:#c2410c;
+  --font-display:"STIX Two Text", "Cambria", "Georgia", serif;
+  --font-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1117; --fg:#e7e9f0; --muted:#979db0; --rule:#272b36; --card:#161922;
+    --accent:#ff7a4d; --accent-fg:#160a05;
+    --s-glued:#3fd0b8; --s-walled:#ff8a5c;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1117; --fg:#e7e9f0; --muted:#979db0; --rule:#272b36; --card:#161922;
+  --accent:#ff7a4d; --accent-fg:#160a05;
+  --s-glued:#3fd0b8; --s-walled:#ff8a5c;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:32px 64px;display:flex;flex-direction:column;gap:28px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--font-display);font-weight:400;font-size:clamp(28px,4.2vw,46px);line-height:1.1;margin:6px 0 12px;text-wrap:balance;max-width:22ch}
+h1 em{font-style:italic;color:var(--accent)}
+h2{font-family:var(--font-display);font-weight:600;font-size:22px;margin:0 0 4px;text-wrap:balance}
+.lede{max-width:68ch;color:var(--muted);margin:0}
+.lede b{color:var(--fg);font-weight:500}
+.math{font-family:var(--font-display);font-style:italic;font-size:1.06em;white-space:nowrap}
+
+.controls{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;padding:12px 14px;border:1px solid var(--rule);border-radius:8px;background:var(--card)}
+.ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.ctl output{font-family:var(--font-mono);color:var(--fg);min-width:3.2em;font-variant-numeric:tabular-nums}
+input[type=range]{width:120px;accent-color:var(--accent)}
+button{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--bg);color:var(--fg);padding:6px 12px;border-radius:6px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);min-width:74px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent;color:var(--muted);padding:6px 10px}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+
+.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+.grid > *{min-width:0}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+figure{margin:0;display:flex;flex-direction:column;gap:10px}
+.plate{background:var(--plate);border-radius:8px;position:relative;overflow:hidden}
+.plate canvas{display:block;width:100%}
+.tag{position:absolute;top:10px;left:12px;font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--plate-muted);pointer-events:none}
+.hint{position:absolute;bottom:10px;right:12px;font-size:11px;color:var(--plate-muted);pointer-events:none}
+figcaption{font-size:14px;color:var(--muted);max-width:62ch}
+figcaption b{color:var(--fg);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:3px;border-radius:2px;display:inline-block}
+.swd{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+.read{border:1px solid var(--rule);border-radius:8px;background:var(--card);padding:16px;display:flex;flex-direction:column;gap:14px}
+.read h3{margin:0;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+table.r{width:100%;border-collapse:collapse;font-size:13px}
+table.r th{font-weight:500;color:var(--muted);text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--rule)}
+table.r td{padding:8px 6px 8px 0;border-bottom:1px solid var(--rule);font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+table.r td:first-child{font-family:var(--font-body)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+#spark{width:100%;height:150px;display:block}
+.note{font-size:12px;color:var(--muted);margin:0}
+
+.argument{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;border-top:1px solid var(--rule);padding-top:24px}
+.argument > *{min-width:0}
+@media (max-width:820px){.argument{grid-template-columns:1fr}}
+.argument p{margin:6px 0 0;font-size:14.5px}
+.argument h3{font-family:var(--font-display);font-size:19px;font-weight:600;margin:0}
+.eq{font-family:var(--font-display);font-style:italic;font-size:17px;padding:10px 14px;border-left:2px solid var(--accent);background:var(--card);overflow-x:auto}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Dimensionality reduction · topology of the target space</div>
+    <h1>A flat square can hold the torus’s density, <em>but not its flow</em></h1>
+    <p class="lede">The data live on a torus embedded in ℝ³. The particle cloud below circulates around both of its holes while its distribution stays exactly <span class="math">p</span>. <b>Map the same particles onto the flat coordinate square</b> and the dynamics only survive if opposite edges are glued, so particles jump. Remove the gluing, as any honest piece of ℝ² must, and either the distribution or the dynamics breaks.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Simulation controls">
+    <button id="play" class="primary" type="button">Pause</button>
+    <button id="reset" type="button">Resample from p</button>
+    <label class="ctl" for="noise">Noise <span class="math">D</span>
+      <input id="noise" type="range" min="0" max="0.6" step="0.01" value="0.15"><output id="noiseOut">0.15</output></label>
+    <label class="ctl" for="cur">Current <span class="math">j</span>
+      <input id="cur" type="range" min="0" max="1.2" step="0.05" value="0.5"><output id="curOut">0.50</output></label>
+    <div class="ctl">Square shows
+      <div class="seg" id="bgSeg">
+        <button type="button" data-v="target" aria-pressed="true">target p</button>
+        <button type="button" data-v="emp" aria-pressed="false">particle histogram</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <figure>
+      <div class="plate" id="torusBox">
+        <canvas id="torus" aria-label="3D torus coloured by density with moving particles" style="touch-action:pan-y"></canvas>
+        <div class="tag">Fig. 1 · Torus in ℝ³</div>
+        <div class="hint">drag to rotate</div>
+      </div>
+      <figcaption><b>The manifold.</b> Colour is the density <span class="math">p(θ, φ)</span>, a band that winds once around both cycles. Particles follow <span class="math">dx = (D∇log p + J/p) dt + √(2D) dW</span> with a constant current <span class="math">J = (j, j)</span>. Both terms leave <span class="math">p</span> invariant, so the cloud keeps the colour map’s shape while it streams around the torus forever.</figcaption>
+      <div class="legend">
+        <span><i class="swd" style="background:var(--tracer)"></i>tracer particles</span>
+        <span><i class="sw" style="background:var(--seamA)"></i>cut θ = 0 (meridian)</span>
+        <span><i class="sw" style="background:#cfd3dc"></i>cut φ = 0 (outer equator)</span>
+      </div>
+    </figure>
+
+    <figure>
+      <div class="plate">
+        <canvas id="glued" aria-label="Flat coordinate square with glued edges"></canvas>
+        <div class="tag">Fig. 2 · Chart, edges glued</div>
+      </div>
+      <figcaption><b>The coordinate patch, with wormholes.</b> The same particles in <span class="math">(θ, φ)</span>. Cutting the torus along the two coloured circles opens it into this square. The flow reproduces Fig. 1 only because each edge is identified with its partner (matching arrows). Every dashed orange line is a particle that moved smoothly on the torus but has to teleport across the chart.</figcaption>
+    </figure>
+  </div>
+
+  <div class="grid">
+    <figure>
+      <div class="plate">
+        <canvas id="walled" aria-label="Flat square without gluing, with reflecting walls"></canvas>
+        <div class="tag">Fig. 3 · Square as a piece of ℝ²</div>
+      </div>
+      <div class="ctl" style="flex-wrap:wrap">Without gluing, try to
+        <div class="seg" id="modeSeg">
+          <button type="button" data-v="keep" aria-pressed="true">keep the same rule, add walls</button>
+          <button type="button" data-v="drop" aria-pressed="false">drop the current</button>
+        </div>
+      </div>
+      <figcaption><b>No teleporting allowed.</b> Same particles, same local rule, but the edges are now real boundaries. Keeping the rule piles mass against the walls and the distribution drifts away from <span class="math">p</span>. Dropping the current recovers <span class="math">p</span>, but the particles no longer circulate: it is a different process with the same snapshot.</figcaption>
+    </figure>
+
+    <div class="read" aria-live="off">
+      <h3>Does the chart reproduce the torus?</h3>
+      <table class="r">
+        <thead><tr><th></th><th>Distance to p (TV)</th><th>Laps / particle / s</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot" style="background:var(--s-glued)"></span>Glued chart = torus</td><td id="tvG">–</td><td id="jG">–</td></tr>
+          <tr><td><span class="dot" style="background:var(--s-walled)"></span>Square in ℝ²</td><td id="tvW">–</td><td id="jW">–</td></tr>
+          <tr><td style="color:var(--muted)">Target</td><td>0 (≈ 0.06 floor with 3000 particles)</td><td id="jT">–</td></tr>
+        </tbody>
+      </table>
+      <canvas id="spark" aria-label="Total-variation distance to p over the last 30 seconds"></canvas>
+      <p class="note">Distance is total variation between a time-smoothed 24×24 particle histogram and <span class="math">p</span> on the same bins; the glued line sits at the sampling floor. Laps counts net crossings of the meridian θ = π. Theory for the torus is <span class="math">j / 2π</span>.</p>
+    </div>
+  </div>
+
+  <section class="argument">
+    <div>
+      <h3>A closed surface does not fit in the plane</h3>
+      <p>Suppose a continuous injective map sent the torus into ℝ². The torus is locally a plane, so by invariance of domain the image would be open. It is also compact, hence closed. A nonempty set that is open and closed is all of ℝ², which is not compact. So every map to a 2D Euclidean target must tear the torus somewhere or fold parts of it onto each other. Here the tear is the pair of coloured circles, and the jumps in Fig. 2 are where you pay for it.</p>
+    </div>
+    <div>
+      <h3>The current is a topological object</h3>
+      <p>The flow carries a stationary current <span class="math">pv</span> that is divergence-free but winds around both holes, with flux <span class="math">j/2π</span> through every meridian. On a square with no-flux walls, integrate <span class="math">∇·(pv) = 0</span> over the region left of any vertical cut: the flux through the cut must be zero. A circulating stationary state with net winding therefore cannot exist there. That is the “Laps” column for Fig. 3.</p>
+    </div>
+    <div>
+      <h3>What a flat target can and cannot keep</h3>
+      <p>A process on the square can always be tuned to have stationary law <span class="math">p</span>, even an irreversible one whose current circulates in closed eddies inside the square. What is lost is the winding: the flux through every cut is zero, so no stationary state carries mass around the torus’s cycles, and lap rates and cycle transit times cannot be reproduced. If the reduction must reproduce dynamics, the target has to carry the topology, for example an embedding in ℝ³ or a latent space that is itself a product of circles <span class="math">S¹ × S¹</span>.</p>
+    </div>
+  </section>
+  <div class="eq">p(θ, φ) ∝ exp[ 1.25 cos(φ − θ − π/3) + 0.6 cos(θ − 2) ],  &nbsp; ∇·(p · J/p) = ∇·J = 0,  &nbsp; ∇·(p D∇log p) = DΔp</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const TAU = Math.PI*2, PI = Math.PI;
+const K = 1.25, L = 0.6, PH = PI/3, TH0 = 2.0;
+const N = 3000, NT = 14, TRAIL = 150, B = 24;
+
+// ---------- density ----------
+const logp = (t,f) => K*Math.cos(f-t-PH) + L*Math.cos(t-TH0);
+let A = 0; { const G = 256; for(let i=0;i<G;i++)for(let k=0;k<G;k++)A+=Math.exp(logp((i+.5)/G*TAU,(k+.5)/G*TAU)); A/=G*G; }
+const ptil = (t,f) => Math.exp(logp(t,f))/A;        // density relative to uniform (mean 1)
+const PMAX = Math.exp(K+L)/A;
+// target bin probabilities
+const Q = new Float64Array(B*B);
+{ const S=6; for(let i=0;i<B;i++)for(let k=0;k<B;k++){let s=0;for(let a=0;a<S;a++)for(let b=0;b<S;b++)s+=ptil((i+(a+.5)/S)/B*TAU,(k+(b+.5)/S)/B*TAU);Q[i*B+k]=s/(S*S)/(B*B);} }
+
+// ---------- colormap (viridis) ----------
+const VS=[[68,1,84],[72,40,120],[62,73,137],[49,104,142],[38,130,142],[31,158,137],[53,183,121],[110,206,88],[253,231,37]];
+function cmap(v){ v=Math.max(0,Math.min(1,v)); const x=v*(VS.length-1), i=Math.min(VS.length-2,Math.floor(x)), u=x-i;
+  const a=VS[i],b=VS[i+1]; return [a[0]+(b[0]-a[0])*u, a[1]+(b[1]-a[1])*u, a[2]+(b[2]-a[2])*u]; }
+const cval = p => Math.pow(p/PMAX, 0.75);
+
+// ---------- simulations ----------
+function makeSim(){ return {x:new Float64Array(N), y:new Float64Array(N), hist:new Float64Array(B*B), tv:0, rate:0, trails:[], events:[]}; }
+const G = makeSim(), W = makeSim();
+let gaussSpare=null;
+function gauss(){ if(gaussSpare!==null){const g=gaussSpare;gaussSpare=null;return g;}
+  let u=0,v=0; while(u===0)u=Math.random(); v=Math.random(); const r=Math.sqrt(-2*Math.log(u)); gaussSpare=r*Math.sin(TAU*v); return r*Math.cos(TAU*v); }
+function resample(){
+  for(let i=0;i<N;i++){ let t,f; do{t=Math.random()*TAU;f=Math.random()*TAU;}while(Math.random()*PMAX>ptil(t,f)); G.x[i]=W.x[i]=t; G.y[i]=W.y[i]=f; }
+  for(const S of [G,W]){ S.hist.set(Q); S.tv=0; S.rate=0; S.events.length=0; S.trails=[]; for(let i=0;i<NT;i++)S.trails.push([[S.x[i],S.y[i]]]); }
+  tvHist.length=0;
+}
+const wrap = v => v - TAU*Math.floor(v/TAU);
+function refl(v){ let n=0; while((v<0||v>TAU)&&n++<8){ if(v<0)v=-v; if(v>TAU)v=2*TAU-v; } return Math.min(TAU,Math.max(0,v)); }
+
+let D=0.15, J=0.5, wallMode='keep', bgMode='target', playing=true, simTime=0;
+
+function step(S, glued, dt){
+  const useJ = glued || wallMode==='keep';
+  const sq = Math.sqrt(2*D*dt); let cross=0;
+  for(let i=0;i<N;i++){
+    const t=S.x[i], f=S.y[i];
+    const c=Math.cos(f-t-PH), s=Math.sin(f-t-PH);
+    const pt=Math.exp(K*c+L*Math.cos(t-TH0))/A;
+    const gt=K*s-L*Math.sin(t-TH0), gf=-K*s;
+    const jv = useJ ? J/pt : 0;
+    let nt=t+(D*gt+jv)*dt+sq*gauss(), nf=f+(D*gf+jv)*dt+sq*gauss();
+    if(t<PI&&nt>=PI)cross++; else if(t>=PI&&nt<PI)cross--;
+    if(glued){
+      const wt=wrap(nt), wf=wrap(nf);
+      if(i<NT && (wt!==nt||wf!==nf)) S.events.push({a:[nt,nf],b:[wt,wf],t0:t,f0:f,time:simTime});
+      S.x[i]=wt; S.y[i]=wf;
+    } else { S.x[i]=refl(nt); S.y[i]=refl(nf); }
+  }
+  return cross;
+}
+const binCount=new Float64Array(B*B);
+function updateStats(S, cross, dt){
+  binCount.fill(0);
+  for(let i=0;i<N;i++){ const bi=Math.min(B-1,Math.floor(S.x[i]/TAU*B)), bk=Math.min(B-1,Math.floor(S.y[i]/TAU*B)); binCount[bi*B+bk]++; }
+  const a=0.04; let tv=0;
+  for(let q=0;q<B*B;q++){ S.hist[q]=(1-a)*S.hist[q]+a*binCount[q]/N; tv+=Math.abs(S.hist[q]-Q[q]); }
+  S.tv=tv/2;
+  if(dt>0){ const r=cross/N/dt; S.rate=S.rate*0.985+r*0.015; }
+}
+
+// ---------- 3D torus ----------
+const R0=1, r0=0.42;
+const tCan=document.getElementById('torus'), tBox=document.getElementById('torusBox');
+let renderer=null, scene, camera, group, ptsGeo, tracerGeo, trailLines=[];
+function torusPos(t,f,rho){ const q=R0+rho*Math.cos(f); return [q*Math.cos(t), rho*Math.sin(f), q*Math.sin(t)]; }
+function initThree(){
+  if(!window.THREE) return;
+  try{ renderer=new THREE.WebGLRenderer({canvas:tCan,antialias:true}); }catch(e){ renderer=null; return; }
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  renderer.setClearColor(0x0b0d13,1);
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(32,1,0.1,50); camera.position.set(0,0,4.6);
+  group=new THREE.Group(); group.rotation.x=0.95; scene.add(group);
+  scene.add(new THREE.AmbientLight(0xffffff,0.62));
+  const dl=new THREE.DirectionalLight(0xffffff,0.55); dl.position.set(1.5,2.5,3); scene.add(dl);
+  // surface
+  const NU=200, NV=72, pos=[], col=[], idx=[];
+  for(let i=0;i<=NU;i++)for(let k=0;k<=NV;k++){ const t=i/NU*TAU,f=k/NV*TAU; pos.push(...torusPos(t,f,r0)); const c=cmap(cval(ptil(t,f))); col.push(c[0]/255,c[1]/255,c[2]/255); }
+  for(let i=0;i<NU;i++)for(let k=0;k<NV;k++){ const a=i*(NV+1)+k,b=(i+1)*(NV+1)+k; idx.push(a,b,a+1,b,b+1,a+1); }
+  const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); g.setAttribute('color',new THREE.Float32BufferAttribute(col,3)); g.setIndex(idx); g.computeVertexNormals();
+  group.add(new THREE.Mesh(g,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide})));
+  // seams
+  const seam=(fn,color)=>{ const p=[]; for(let s=0;s<128;s++)p.push(new THREE.Vector3(...fn(s/128*TAU))); const curve=new THREE.CatmullRomCurve3(p,true);
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,256,0.011,8,true),new THREE.MeshBasicMaterial({color}))); };
+  seam(f=>torusPos(0,f,r0+0.004),0xff4fd8);
+  seam(t=>torusPos(t,0,r0+0.004),0xf2f2f2);
+  // particles
+  ptsGeo=new THREE.BufferGeometry(); ptsGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*3),3));
+  group.add(new THREE.Points(ptsGeo,new THREE.PointsMaterial({color:0xffffff,size:2.2*renderer.getPixelRatio(),sizeAttenuation:false,transparent:true,opacity:0.6,depthWrite:false})));
+  tracerGeo=new THREE.BufferGeometry(); tracerGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(NT*3),3));
+  const tp=new THREE.Points(tracerGeo,new THREE.PointsMaterial({color:0xff6a3d,size:7*renderer.getPixelRatio(),sizeAttenuation:false})); tp.renderOrder=3; group.add(tp);
+  for(let i=0;i<NT;i++){ const lg=new THREE.BufferGeometry(); lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(TRAIL*3),3));
+    const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:0xff6a3d,transparent:true,opacity:0.85})); group.add(ln); trailLines.push(ln); }
+  // drag
+  let drag=null;
+  tCan.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};tCan.setPointerCapture(e.pointerId);});
+  tCan.addEventListener('pointermove',e=>{ if(!drag)return; group.rotation.y+=(e.clientX-drag.x)*0.01; group.rotation.x=Math.max(-1.5,Math.min(1.5,group.rotation.x+(e.clientY-drag.y)*0.01)); drag={x:e.clientX,y:e.clientY}; if(!playing)drawAll(); });
+  const end=()=>{drag=null;}; tCan.addEventListener('pointerup',end); tCan.addEventListener('pointercancel',end);
+  tCan._drag=()=>drag;
+}
+function sizeThree(){ if(!renderer)return; const w=tBox.clientWidth, h=Math.round(Math.min(w*0.82,620)); renderer.setSize(w,h,false); tCan.style.height=h+'px'; camera.aspect=w/h; camera.updateProjectionMatrix(); }
+function drawTorus(){
+  if(!renderer)return;
+  const P=ptsGeo.attributes.position.array, rho=r0+0.012;
+  for(let i=0;i<N;i++){ const p=torusPos(G.x[i],G.y[i],rho); P[3*i]=p[0];P[3*i+1]=p[1];P[3*i+2]=p[2]; }
+  ptsGeo.attributes.position.needsUpdate=true;
+  const T=tracerGeo.attributes.position.array;
+  for(let i=0;i<NT;i++){ const p=torusPos(G.x[i],G.y[i],r0+0.02); T[3*i]=p[0];T[3*i+1]=p[1];T[3*i+2]=p[2];
+    const tr=G.trails[i], L3=trailLines[i].geometry.attributes.position.array;
+    for(let k=0;k<tr.length;k++){ const q=torusPos(tr[k][0],tr[k][1],r0+0.016); L3[3*k]=q[0];L3[3*k+1]=q[1];L3[3*k+2]=q[2]; }
+    trailLines[i].geometry.setDrawRange(0,tr.length); trailLines[i].geometry.attributes.position.needsUpdate=true; }
+  tracerGeo.attributes.position.needsUpdate=true;
+  renderer.render(scene,camera);
+}
+
+// ---------- 2D charts ----------
+const targetImg=document.createElement('canvas'); targetImg.width=targetImg.height=256;
+{ const c=targetImg.getContext('2d'), im=c.createImageData(256,256);
+  for(let i=0;i<256;i++)for(let k=0;k<256;k++){ const t=(i+.5)/256*TAU, f=(k+.5)/256*TAU, col=cmap(cval(ptil(t,f))), o=((255-k)*256+i)*4; im.data[o]=col[0];im.data[o+1]=col[1];im.data[o+2]=col[2];im.data[o+3]=255; }
+  c.putImageData(im,0,0); }
+const empCan={}; for(const k of ['g','w']){ const c=document.createElement('canvas'); c.width=c.height=B; empCan[k]=c; }
+function renderEmp(S,key){ const c=empCan[key].getContext('2d'), im=c.createImageData(B,B);
+  for(let i=0;i<B;i++)for(let k=0;k<B;k++){ const col=cmap(cval(S.hist[i*B+k]*B*B)), o=((B-1-k)*B+i)*4; im.data[o]=col[0];im.data[o+1]=col[1];im.data[o+2]=col[2];im.data[o+3]=255; }
+  c.putImageData(im,0,0); return empCan[key]; }
+
+const charts={ g:{can:document.getElementById('glued'),S:G,glued:true}, w:{can:document.getElementById('walled'),S:W,glued:false} };
+function sizeCharts(){ const dpr=Math.min(2,window.devicePixelRatio||1);
+  for(const k in charts){ const ch=charts[k], w=ch.can.parentElement.clientWidth, h=Math.min(w,560); ch.can.width=Math.round(w*dpr); ch.can.height=Math.round(h*dpr); ch.can.style.height=h+'px'; ch.dpr=dpr; ch.w=w; ch.h=h; } }
+
+function arrowHead(ctx,x,y,ang,sz){ ctx.save(); ctx.translate(x,y); ctx.rotate(ang); ctx.beginPath(); ctx.moveTo(sz,0); ctx.lineTo(-sz*0.7,sz*0.75); ctx.lineTo(-sz*0.7,-sz*0.75); ctx.closePath(); ctx.fill(); ctx.restore(); }
+function drawChart(ch, key){
+  const {can,S,glued,dpr}=ch, ctx=can.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,ch.w,ch.h);
+  const pad=34, side=Math.min(ch.w,ch.h)-pad*2, ox=(ch.w-side)/2+6, oy=pad;
+  const X=t=>ox+t/TAU*side, Y=f=>oy+side-f/TAU*side;
+  ctx.imageSmoothingEnabled=true;
+  ctx.drawImage(bgMode==='target'?targetImg:renderEmp(S,key),ox,oy,side,side);
+  // bulk particles
+  ctx.fillStyle='rgba(255,255,255,0.55)';
+  for(let i=NT;i<N;i++) ctx.fillRect(X(S.x[i])-0.7,Y(S.y[i])-0.7,1.4,1.4);
+  // trails
+  ctx.lineWidth=1.6; ctx.strokeStyle='rgba(255,106,61,0.9)';
+  for(let i=0;i<NT;i++){ const tr=S.trails[i]; ctx.beginPath();
+    for(let k=0;k<tr.length;k++){ const [t,f]=tr[k]; if(k===0||Math.abs(t-tr[k-1][0])>PI||Math.abs(f-tr[k-1][1])>PI)ctx.moveTo(X(t),Y(f)); else ctx.lineTo(X(t),Y(f)); }
+    ctx.stroke(); }
+  // teleport events
+  if(glued){
+    const life=1.1; S.events=S.events.filter(e=>simTime-e.time<life);
+    for(const e of S.events){ const a=1-(simTime-e.time)/life;
+      const x0=X(Math.min(TAU,Math.max(0,e.a[0]))), y0=Y(Math.min(TAU,Math.max(0,e.a[1]))), x1=X(e.b[0]), y1=Y(e.b[1]);
+      ctx.setLineDash([4,5]); ctx.strokeStyle=`rgba(255,106,61,${0.9*a})`; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke(); ctx.setLineDash([]);
+      const rr=4+10*(1-a); ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x0,y0,rr,0,TAU); ctx.stroke(); ctx.beginPath(); ctx.arc(x1,y1,rr,0,TAU); ctx.stroke(); }
+  }
+  // tracer heads
+  ctx.fillStyle='#ff6a3d'; ctx.strokeStyle='#0b0d13'; ctx.lineWidth=1.5;
+  for(let i=0;i<NT;i++){ ctx.beginPath(); ctx.arc(X(S.x[i]),Y(S.y[i]),3.6,0,TAU); ctx.fill(); ctx.stroke(); }
+  // edges
+  if(glued){
+    ctx.lineWidth=2.5;
+    ctx.strokeStyle='#ff4fd8'; ctx.fillStyle='#ff4fd8';
+    for(const x of [ox,ox+side]){ ctx.beginPath(); ctx.moveTo(x,oy); ctx.lineTo(x,oy+side); ctx.stroke(); arrowHead(ctx,x,oy+side/2,-PI/2,7); }
+    ctx.strokeStyle='#f2f2f2'; ctx.fillStyle='#f2f2f2';
+    for(const y of [oy,oy+side]){ ctx.beginPath(); ctx.moveTo(ox,y); ctx.lineTo(ox+side,y); ctx.stroke(); arrowHead(ctx,ox+side/2-6,y,0,7); arrowHead(ctx,ox+side/2+8,y,0,7); }
+  } else {
+    ctx.strokeStyle='#9aa0b3'; ctx.lineWidth=4; ctx.strokeRect(ox-2,oy-2,side+4,side+4);
+    ctx.save(); ctx.beginPath(); ctx.rect(ox-12,oy-12,side+24,side+24); ctx.rect(ox-2,oy-2,side+4,side+4); ctx.clip('evenodd');
+    ctx.strokeStyle='rgba(154,160,179,0.45)'; ctx.lineWidth=1; for(let s=-side;s<side*2;s+=7){ ctx.beginPath(); ctx.moveTo(ox+s,oy-12); ctx.lineTo(ox+s+side+24,oy+side+12); ctx.stroke(); } ctx.restore();
+  }
+  // axes
+  ctx.fillStyle='#80869a'; ctx.font='11px "IBM Plex Mono", monospace'; ctx.textAlign='center'; ctx.textBaseline='top';
+  const lbl=['0','π','2π']; for(let k=0;k<3;k++){ ctx.fillText(lbl[k],X(k*PI),oy+side+(glued?8:14)); }
+  ctx.textAlign='right'; ctx.textBaseline='middle'; for(let k=0;k<3;k++) ctx.fillText(lbl[k],ox-(glued?8:16),Y(k*PI));
+  ctx.font='italic 14px "STIX Two Text", serif'; ctx.fillStyle='#dde0ea'; ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('θ',ox+side+(glued?8:14),oy+side+6); ctx.textBaseline='bottom'; ctx.fillText('φ',ox-(glued?20:26),oy-4);
+}
+
+// ---------- readouts ----------
+const tvHist=[]; const sCan=document.getElementById('spark');
+let tok={};
+function readTokens(){ const cs=getComputedStyle(document.documentElement); for(const k of ['--s-glued','--s-walled','--muted','--rule','--fg'])tok[k]=cs.getPropertyValue(k).trim(); }
+function drawSpark(){
+  const dpr=Math.min(2,window.devicePixelRatio||1), w=sCan.clientWidth, h=150; if(sCan.width!==Math.round(w*dpr)){sCan.width=Math.round(w*dpr);sCan.height=h*dpr;}
+  const c=sCan.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h);
+  const l=34,r=8,t=10,b=22, pw=w-l-r, ph=h-t-b, M=600;
+  let ymax=0.3; for(const p of tvHist)ymax=Math.max(ymax,p[0],p[1]); ymax=Math.ceil(ymax*10)/10;
+  c.strokeStyle=tok['--rule']; c.lineWidth=1; c.fillStyle=tok['--muted']; c.font='10px "IBM Plex Mono", monospace'; c.textAlign='right'; c.textBaseline='middle';
+  for(let v=0;v<=ymax+1e-9;v+=ymax/2){ const y=t+ph-v/ymax*ph; c.beginPath(); c.moveTo(l,y); c.lineTo(l+pw,y); c.stroke(); c.fillText(v.toFixed(2),l-6,y); }
+  c.textAlign='left'; c.textBaseline='top'; c.fillText('−30 s',l,t+ph+6); c.textAlign='right'; c.fillText('now',l+pw,t+ph+6);
+  for(const [j,key] of [[0,'--s-glued'],[1,'--s-walled']]){
+    c.strokeStyle=tok[key]; c.lineWidth=2; c.beginPath();
+    tvHist.forEach((p,i)=>{ const x=l+pw-(tvHist.length-1-i)/(M-1)*pw, y=t+ph-p[j]/ymax*ph; i?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke();
+    if(tvHist.length){ const p=tvHist[tvHist.length-1]; c.fillStyle=tok[key]; c.beginPath(); c.arc(l+pw,t+ph-p[j]/ymax*ph,3,0,TAU); c.fill(); }
+  }
+}
+const el=id=>document.getElementById(id);
+function updateReadouts(){
+  el('tvG').textContent=G.tv.toFixed(3); el('tvW').textContent=W.tv.toFixed(3);
+  el('jG').textContent=G.rate.toFixed(3); el('jW').textContent=W.rate.toFixed(3); el('jT').textContent=(J/TAU).toFixed(3);
+}
+
+// ---------- loop ----------
+function drawAll(){ drawTorus(); drawChart(charts.g,'g'); drawChart(charts.w,'w'); drawSpark(); updateReadouts(); }
+let last=null, frame=0;
+function tick(now){
+  requestAnimationFrame(tick);
+  if(last===null){last=now;return;}
+  let dt=Math.min(1/30,(now-last)/1000); last=now;
+  if(!playing){ return; }
+  const sub=5, h=dt/sub; let cg=0,cw=0;
+  for(let s=0;s<sub;s++){ simTime+=h; cg+=step(G,true,h); cw+=step(W,false,h); }
+  updateStats(G,cg,dt); updateStats(W,cw,dt);
+  for(const S of [G,W]) for(let i=0;i<NT;i++){ const tr=S.trails[i]; tr.push([S.x[i],S.y[i]]); if(tr.length>TRAIL)tr.shift(); }
+  if(renderer && !(tCan._drag&&tCan._drag())) group.rotation.y+=0.0025;
+  if(frame%3===0){ tvHist.push([G.tv,W.tv]); if(tvHist.length>600)tvHist.shift(); }
+  if(frame%60===0) readTokens();
+  frame++;
+  drawTorus(); drawChart(charts.g,'g'); drawChart(charts.w,'w');
+  if(frame%3===0) drawSpark();
+  if(frame%8===0) updateReadouts();
+}
+
+// ---------- controls ----------
+const playBtn=el('play');
+function setPlaying(v){ playing=v; playBtn.textContent=v?'Pause':'Play'; }
+playBtn.addEventListener('click',()=>setPlaying(!playing));
+el('reset').addEventListener('click',()=>{ resample(); drawAll(); });
+el('noise').addEventListener('input',e=>{ D=+e.target.value; el('noiseOut').textContent=D.toFixed(2); });
+el('cur').addEventListener('input',e=>{ J=+e.target.value; el('curOut').textContent=J.toFixed(2); updateReadouts(); });
+function seg(id,cb){ const g=el(id); g.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b)return; g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false')); cb(b.dataset.v); }); }
+seg('bgSeg',v=>{ bgMode=v; if(!playing)drawAll(); });
+seg('modeSeg',v=>{ wallMode=v; });
+
+// ---------- boot ----------
+readTokens(); resample(); initThree(); sizeThree(); sizeCharts();
+if(!renderer){ const m=document.createElement('div'); m.className='tag'; m.style.top='50%'; m.textContent='3D view needs WebGL'; tBox.appendChild(m); }
+if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) setPlaying(false);
+drawAll();
+new ResizeObserver(()=>{ sizeThree(); sizeCharts(); drawAll(); }).observe(document.querySelector('.wrap'));
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -1,9 +1,10 @@
 // Bundle every video into one self-contained HTML file: dist/<id>.html.
+// Standalone explorables (explorables/*.html) are copied as they are to dist/explorables/.
 // Usage: npm run build            (all videos)
-//        npm run build -- part-0  (only the named ones)
+//        npm run build -- part-0  (only the named videos; explorables are always copied)
 
 import { build } from 'esbuild';
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const root = new URL('../', import.meta.url);
@@ -46,4 +47,12 @@ for (const id of ids) {
     .replace(ENTRY, `<script>\n${js}</script>`);
   await writeFile(new URL(`dist/${id}.html`, root), html);
   console.log(`dist/${id}.html  ${(html.length / 1024).toFixed(0)} kB`);
+}
+
+// a subfolder, because the smoke test treats every top-level dist/*.html as a video
+const explorables = (await readdir(new URL('explorables/', root)).catch(() => [])).filter((f) => f.endsWith('.html'));
+if (explorables.length) await mkdir(new URL('dist/explorables/', root), { recursive: true });
+for (const file of explorables) {
+  await copyFile(new URL(`explorables/${file}`, root), new URL(`dist/explorables/${file}`, root));
+  console.log(`dist/explorables/${file}`);
 }
