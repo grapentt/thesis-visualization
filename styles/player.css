@@ -208,10 +208,38 @@ h1 em {
   color: var(--muted);
 }
 
+.control-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+
+.control-group + .control-group {
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+}
+
+.group-label {
+  font: 500 0.68rem var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 .live-controls .control {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+/* the video is moving this control right now */
+.live-controls .control.moving {
+  background: rgba(242, 207, 99, 0.12);
+  box-shadow: 0 0 0 1px var(--gold);
 }
 
 .live-controls input[type="range"] {

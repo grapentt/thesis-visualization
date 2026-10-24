@@ -25,6 +25,8 @@ const HANDOVER_SHOWN = 8;
 /** Time per frame for simulating, in ms: normally, and while catching up after a far jump. */
 const FRAME_BUDGET = 10;
 const CATCH_UP_BUDGET = 14;
+/** How long a control stays highlighted after the video moved it, in ms. */
+const MOVING_SHOWN = 900;
 
 export class Player {
   /**
@@ -65,7 +67,7 @@ export class Player {
   // ---- public API --------------------------------------------------------
 
   play() {
-    if (this.view.explore) this.backToVideo();
+    this.#leaveExplore();
     if (this.time >= this.timeline.duration - 0.01) this.time = 0;
     this.playing = true;
     this.#hidePoster();
@@ -84,7 +86,7 @@ export class Player {
   }
 
   seek(T) {
-    if (this.view.explore) this.backToVideo();
+    this.#leaveExplore();
     this.time = clamp(T, 0, this.timeline.duration - 0.001);
     this.#hidePoster();
     this.#startWarmUp();
@@ -139,17 +141,14 @@ export class Player {
     this.invalidate();
   }
 
-  /** Leave explore mode: the narrated version again, at the moment where exploring began. */
-  backToVideo() {
-    if (!this.view.explore) return;
-    this.view.stopExplore();
-    this.#syncExplore();
-    this.invalidate();
+  /** Leave explore mode and play the narrated version on from the moment where exploring began. */
+  resumeVideo() {
+    this.play();
   }
 
   /** Forget everything computed or set for live scenes (used by window.video.reset). */
   resetLive() {
-    this.backToVideo();
+    this.#leaveExplore();
     this.stopWarmUp?.();
     this.stopWarmUp = null;
     this.view.clear();
@@ -157,6 +156,14 @@ export class Player {
   }
 
   // ---- internals ---------------------------------------------------------
+
+  /** Back to the narrated version at the moment where exploring began (without playing). */
+  #leaveExplore() {
+    if (!this.view.explore) return;
+    this.view.stopExplore();
+    this.#syncExplore();
+    this.invalidate();
+  }
 
   #scene() {
     return this.timeline.sceneAt(this.time);
@@ -224,7 +231,7 @@ export class Player {
       this.#buildControls(scene);
     }
     const line = this.view.explore
-      ? 'You are exploring: the narration is paused here. Space pauses the simulation; Esc or “Back to the video” returns to the narration.'
+      ? 'You are exploring: the narration is paused here. Space pauses the simulation; Esc or “Resume the video” plays the narration on from here.'
       : narrationAt(scene, t).text;
     if (ui.narration && line !== this.shownNarration) {
       this.shownNarration = line;
@@ -282,24 +289,29 @@ export class Player {
     if (strip) strip.hidden = !scene.live;
     if (!scene.controls) return;
 
+    // two groups, so viewers can tell which controls pause the video
+    const physics = el('div', { className: 'control-group', role: 'group', ariaLabel: 'Physics' }, el('span', { className: 'group-label', textContent: 'Physics · pauses the video' }));
+    const view = el('div', { className: 'control-group', role: 'group', ariaLabel: 'View' }, el('span', { className: 'group-label', textContent: 'View' }));
     for (const [name, c] of Object.entries(scene.controls)) {
+      const group = c.lens ? view : physics;
       if (c.kind === 'slider') {
         const input = el('input', { type: 'range', min: c.min, max: c.max, step: c.step, id: `control-${name}` });
         const output = el('output', { htmlFor: input.id });
         input.addEventListener('input', () => this.#onControl(name, parseFloat(input.value)));
-        controls.append(el('label', { className: 'control' }, `${c.label} `, input, output));
-        this.controlInputs.set(name, { c, input, output });
+        const row = el('label', { className: 'control' }, `${c.label} `, input, output);
+        group.append(row);
+        this.controlInputs.set(name, { c, row, input, output });
       } else if (c.kind === 'choice') {
         const buttons = Object.entries(c.options).map(([key, label]) => {
           const button = el('button', { type: 'button', textContent: label });
           button.addEventListener('click', () => this.#onControl(name, key));
           return [key, button];
         });
-        const group = el('span', { className: 'segmented', role: 'group', ariaLabel: c.label }, ...buttons.map(([, b]) => b));
-        controls.append(el('div', { className: 'control' }, `${c.label} `, group));
-        this.controlInputs.set(name, { c, buttons });
+        const row = el('div', { className: 'control' }, `${c.label} `, el('span', { className: 'segmented', role: 'group', ariaLabel: c.label }, ...buttons.map(([, b]) => b)));
+        group.append(row);
+        this.controlInputs.set(name, { c, row, buttons });
       } else {
-        controls.append(el('span', { className: 'control hint-inline', textContent: c.label }));
+        group.append(el('span', { className: 'control hint-inline', textContent: c.label }));
       }
     }
     if (Object.values(scene.controls).some((c) => c.lens)) {
@@ -308,14 +320,21 @@ export class Player {
         this.view.resetLenses(scene);
         this.invalidate();
       });
-      controls.append(reset);
+      view.append(reset);
     }
+    for (const group of [physics, view]) if (group.childElementCount > 1) controls.append(group);
   }
 
-  /** Show the current values (authored, or the viewer's) on the controls. */
+  /**
+   * Show the current values (authored, or the viewer's) on the controls, and highlight a control
+   * while the video itself is moving it, so viewers see what each control does.
+   */
   #syncControls() {
     if (!this.controlInputs?.size || !this.live) return;
-    for (const [name, { c, input, output, buttons }] of this.controlInputs) {
+    const scene = this.#scene();
+    const now = performance.now();
+    for (const [name, entry] of this.controlInputs) {
+      const { c, row, input, output, buttons } = entry;
       const value = this.live.input[name];
       if (input) {
         if (document.activeElement !== input || !this.view.explore) input.value = value;
@@ -323,6 +342,10 @@ export class Player {
       } else {
         for (const [key, button] of buttons) button.setAttribute('aria-pressed', String(key === value));
       }
+      const byVideo = !this.view.explore && this.view.lens(scene, name) === undefined;
+      if (value !== entry.shown && entry.shown !== undefined && byVideo) entry.movedAt = now;
+      entry.shown = value;
+      row.classList.toggle('moving', now - (entry.movedAt ?? -Infinity) < MOVING_SHOWN);
     }
   }
 
@@ -422,7 +445,7 @@ export class Player {
     ui.fullscreen?.addEventListener('click', () => this.#toggleFullscreen());
     ui.handoverTry?.addEventListener('click', () => this.explore());
     ui.explorePause?.addEventListener('click', () => this.#toggleExplorePause());
-    ui.exploreBack?.addEventListener('click', () => this.backToVideo());
+    ui.exploreBack?.addEventListener('click', () => this.resumeVideo());
 
     // the button last pressed with the pointer, while it keeps the focus (Chrome would report it as
     // :focus-visible as soon as a key is pressed, so that cannot tell)
@@ -447,7 +470,7 @@ export class Player {
           if (!this.playing && ui.poster && !ui.poster.hidden) this.time = 0;
           this.toggle();
         }
-      } else if (e.key === 'Escape' && this.view.explore) this.backToVideo();
+      } else if (e.key === 'Escape' && this.view.explore) this.resumeVideo();
       else if (e.key === 'ArrowRight' && tag !== 'INPUT') this.seek(this.time + 5);
       else if (e.key === 'ArrowLeft' && tag !== 'INPUT') this.seek(this.time - 5);
       else if (e.key === ']') this.seekScene(this.timeline.indexAt(this.time) + 1);
