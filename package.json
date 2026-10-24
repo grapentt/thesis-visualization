@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
-    "test": "node scripts/smoke-test.mjs",
+    "test": "node --test 'tests/*.test.mjs' && node scripts/smoke-test.mjs",
     "export": "node scripts/export-frames.mjs"
   },
   "devDependencies": {
@@ -15,6 +15,6 @@
     "playwright": "^1.63.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
