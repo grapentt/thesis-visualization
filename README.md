@@ -1,13 +1,39 @@
-# Thesis visualization: the geometry of molecular diffusion
+# Thesis visualization
 
-Animated explainer videos built to help me visualise my master's thesis.
+Animated and interactive explainers built to help me visualise my master's thesis.
 
-I built this project to help me visualise the ideas behind my master's thesis on
-diffusion models for generating molecular configurations. The thesis argues
-that these models should not add noise, predict scores and measure errors in
-flat Euclidean coordinates, but in a geometry that knows how stiff each
-direction of a molecule is. Equations make that argument precise; these
-animations are meant to make it intuitive.
+The thesis is about generative models for molecular configurations that respect
+the geometry of the problem. A molecule's shape does not change when it is moved
+or rotated, some of its motions are far stiffer than others, and realistic
+configurations concentrate near lower-dimensional submanifolds. The thesis
+follows three threads:
+
+- **Diffusion in the right geometry.** Score-based diffusion models that add
+  noise, predict scores and measure errors with a Riemannian metric that knows
+  how stiff each direction of a molecule is, instead of in flat coordinates.
+- **Flow matching.** Learning a velocity field that carries a simple
+  distribution to the data, on the same geometric footing.
+- **Atlases of local charts.** A new method, in development, meant to discover
+  the lower-dimensional submanifold the data lie on, cover it with overlapping
+  local charts joined by transition maps, and run learning directly on it.
+
+Equations make these arguments precise; the pieces here are meant to make them
+intuitive.
+
+## What is here
+
+| Piece | Kind | Thread |
+| --- | --- | --- |
+| Part 0 · The geometry of shape space 1 | video, about 8 min | shape space: bundles, connections, curvature |
+| Part 1 · Diffusion in the right geometry | video, about 5 min | diffusion: stiffness and the metric |
+| Torus flow, flattened | explorable | atlases: why one flat chart is not enough |
+
+**Videos** are narrated timelines with chapters, scrubbing and frame-by-frame
+export to MP4. **Explorables** are interactive pages to play with directly.
+The torus page only motivates atlases; flow matching and the atlas method
+itself will get their own pieces. The plan is to
+merge both kinds into *playable videos*; see
+[Interactive videos](#interactive-videos-next).
 
 ## The videos
 
@@ -57,14 +83,80 @@ Each video runs in the browser as an interactive player with chapters, scrubbing
 and narration, and can be exported frame by frame to MP4. Everything is plain
 JavaScript on a 2D canvas, with MathJax for the formulas and no framework.
 
+## Explorables
+
+**Torus flow, flattened** (`explorables/torus-flow.html`) shows why one flat
+chart is not enough. Particles move on a torus, in angle coordinates (θ, φ),
+under a stochastic dynamics that keeps their density p(θ, φ) fixed while a
+current j makes the cloud circulate in both directions around the torus:
+around the central hole and around the tube. The page shows the same particles
+three ways:
+
+1. **On the torus in ℝ³** (drag to rotate). The cloud streams around forever and
+   keeps the shape of p. The colour shows p per unit of θ and φ; the dots look
+   denser on the inner side because the embedding compresses area there.
+2. **On the flat coordinate square with glued edges.** The flow survives only
+   because opposite edges are identified, so particles jump from one edge to the
+   other.
+3. **On the square as an ordinary region of the plane, with reflecting walls
+   instead of glued edges.** Keeping the same equation of motion, current
+   included, piles mass against the walls, so the density drifts away from p.
+   Dropping the current brings the density back to p, but nothing circulates any
+   more.
+
+The readouts give the total-variation distance between the particle histogram
+and p (0 means identical; with 3000 particles the floor is about 0.06), and the
+laps per particle per second. On the torus the lap rate is j/2π, because the
+page normalises p to mean 1 over the coordinate square.
+
+The walled square is simply connected and its walls let no mass through, so it
+cannot carry the winding current; the glued square carries it only through the
+jumps. An atlas replaces the single glued square with overlapping charts. A
+particle is re-expressed in the next chart while it is inside the overlap, where
+both charts are valid, so no step ever runs into an edge or a wall.
+
+Open it with `npm run dev` at http://localhost:5173/explorables/torus-flow.html,
+or open the file directly. It loads three.js and fonts from CDNs, so the 3D view
+needs a network connection and WebGL. Without either, the 3D panel shows
+"3D view needs WebGL" (also when only the network is missing); the flat squares
+and readouts still run. The page follows the system's light or dark theme, while
+the videos are always dark. The simulation runs live with unseeded randomness,
+so it cannot be scrubbed or exported to MP4 yet. The page is kept as it was
+made, apart from three text corrections in its readout table and argument
+columns.
+
+## Interactive videos (next)
+
+All videos and explorables will be reworked into *playable videos*. None of
+this is built yet. A playable video will play as a complete narrated film, but
+some scenes will be live: their sliders move on their own while the narration
+demonstrates, and the viewer can take over at any moment.
+
+- Touching a physics control, such as the noise or the current, pauses the
+  narration. The simulation then runs on from that moment under the viewer's
+  settings. "Back to the video" returns to the narration.
+- View controls, such as rotating the torus, never interrupt.
+- MP4 export always shows the authored performance.
+
+Live simulations will use a fixed time step and a seeded random-number
+generator, so the same moment always gives the same picture in the same browser
+build. Saved snapshots of the simulation will make jumps to any moment fast, so
+scrubbing and MP4 export keep working. The design, measurements of a trial port
+of the torus simulation and the plan are in
+[docs/interactive-video.md](docs/interactive-video.md).
+
 ## Quick start
 
 ```bash
 npm install                      # esbuild (build) and Playwright (tests, export)
-npm run dev                      # http://localhost:5173/?video=part-0 (or part-1)
-npm run build                    # dist/part-0.html, dist/part-1.html: one self-contained file per video
-npm test                         # renders every scene of every video headless, fails on errors
+npm run dev                      # http://localhost:5173/?video=part-0 (or part-1), /explorables/torus-flow.html
+npm run build                    # dist/part-0.html, dist/part-1.html: one self-contained file per video; dist/explorables/
+npm test                         # renders every scene of every video (fails on any error) and runs every explorable for 1 s (fails on uncaught exceptions)
 ```
+
+`npm test` needs Playwright's Chromium (`npx playwright install chromium`). For
+a quick smoke run in an installed Google Chrome instead, use
+`PLAYWRIGHT_CHANNEL=chrome npm test`.
 
 Export a high-quality video (needs `ffmpeg` and `npx playwright install chromium`):
 
@@ -93,6 +185,8 @@ src/
     common/             pieces shared by several videos
     part-0/             meta.json, index.js (the scene list), scenes/, and helpers
     part-1/             the same for Part 1
+explorables/            standalone interactive pages, copied to dist/explorables/ by the build
+docs/                   design notes
 scripts/                dev server, build, smoke test, frame export
 ```
 

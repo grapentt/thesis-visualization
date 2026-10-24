@@ -2,7 +2,7 @@
   "name": "thesis-visualization",
   "version": "0.1.0",
   "private": true,
-  "description": "Animated explainer: stiffness in molecular diffusion models and why a Riemannian metric helps.",
+  "description": "Animated and interactive explainers for a master's thesis on geometry-aware generative models of molecular configurations.",
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
