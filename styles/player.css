@@ -101,15 +101,29 @@ h1 em {
   aspect-ratio: 16 / 9;
 }
 
-.stage:fullscreen {
-  border: 0;
-  border-radius: 0;
+.screen {
   display: grid;
-  place-items: center;
+  gap: 8px;
 }
 
-.stage:fullscreen canvas {
-  width: min(100vw, calc(100vh * 16 / 9));
+.screen:fullscreen {
+  background: var(--stage);
+  align-content: center;
+  justify-items: center;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.screen:fullscreen .stage {
+  border: 0;
+  border-radius: 0;
+}
+
+/* leave room for the control strip below the canvas (--strip: its measured height, set by the player) */
+.screen:fullscreen canvas,
+.screen:fullscreen .live-strip {
+  width: min(calc(100vw - 16px), calc((100vh - 24px - var(--strip, 0px)) * 16 / 9));
+  box-sizing: border-box;
 }
 
 .poster-play {
@@ -129,6 +143,125 @@ h1 em {
 
 [hidden] {
   display: none !important;
+}
+
+/* ---- live scenes: hand-over prompt, control strip, explore bar */
+.handover {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 6%;
+  margin-inline: auto;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(90%, 760px);
+  box-sizing: border-box;
+  padding: 0.6em 0.7em 0.6em 1.1em;
+  background: rgba(20, 28, 46, 0.94);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.handover p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.handover button,
+.explore-bar button,
+.live-controls button {
+  font: 500 0.82rem var(--sans);
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.4em 0.8em;
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.handover button,
+#explore-back {
+  background: var(--gold);
+  color: var(--stage);
+  border-color: var(--gold);
+  white-space: nowrap;
+}
+
+.live-strip {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.live-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 22px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.live-controls .control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-controls input[type="range"] {
+  flex: 0 1 140px;
+  width: 140px;
+}
+
+.live-controls output {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  min-width: 3em;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.live-controls .segmented button {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.live-controls .segmented button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--stage);
+}
+
+.hint-inline {
+  font-style: italic;
+}
+
+.explore-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--gold);
+}
+
+.explore-bar span {
+  flex: 1 1 260px;
 }
 
 /* ---- transport */
@@ -241,6 +374,12 @@ input:focus-visible {
 .chapters button.on b {
   color: var(--gold);
   border-color: var(--gold);
+}
+
+/* named moments inside a long live scene */
+.chapters button.beat {
+  border-style: dashed;
+  font-size: 0.72rem;
 }
 
 .hint {
