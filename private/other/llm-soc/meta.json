@@ -1,0 +1,6 @@
+{
+  "id": "llm-soc",
+  "title": "LLMs Beyond the Chat Window",
+  "heading": ["LLMs beyond the", "chat window"],
+  "label": "LLMs in security workflows · Triaging alerts with a local LLM"
+}
