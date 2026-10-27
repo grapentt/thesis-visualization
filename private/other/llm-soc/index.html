@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LLMs beyond the chat window</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;1,400;1,500&display=swap">
+  <link rel="stylesheet" href="../../../styles/player.css">
+  <script>
+    // MathJax renders formulas to SVG; src/draw/tex.js listens for 'mathjax-ready'.
+    window.MathJax = {
+      svg: { fontCache: 'none' },
+      startup: {
+        typeset: false,
+        ready() {
+          MathJax.startup.defaultReady();
+          MathJax.startup.promise.then(() => {
+            window.__mathjaxReady = true;
+            window.dispatchEvent(new Event('mathjax-ready'));
+          });
+        },
+      },
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <h1 id="video-heading"></h1>
+      <span class="meta" id="video-label"></span>
+      <nav class="video-nav" id="video-nav" aria-label="Videos" hidden></nav>
+    </header>
+
+    <div class="screen" id="screen">
+      <div class="stage" id="stage">
+        <canvas id="stage-canvas" width="1600" height="900" aria-label="Animated explainer"></canvas>
+        <button id="poster-play" class="poster-play" type="button">▶&nbsp; Play from the start</button>
+        <div class="handover" id="handover" role="status" hidden>
+          <p id="handover-text"></p>
+          <button id="handover-try" type="button">Try it</button>
+        </div>
+      </div>
+      <div class="live-strip" id="live-strip" hidden>
+        <div class="live-controls" id="live-controls"></div>
+        <div class="explore-bar" id="explore-bar" hidden>
+          <span id="explore-status"></span>
+          <button id="explore-pause" type="button">Pause simulation</button>
+          <button id="explore-back" type="button">Resume the video</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="transport">
+      <button id="play" type="button">Play</button>
+      <button id="prev" type="button" title="Previous chapter" aria-label="Previous chapter">‹ Prev</button>
+      <button id="next" type="button" title="Next chapter" aria-label="Next chapter">Next ›</button>
+      <input id="scrub" type="range" min="0" max="100" step="0.05" value="0" aria-label="Timeline">
+      <span id="time" class="time">0:00 / 0:00</span>
+      <select id="speed" aria-label="Playback speed">
+        <option value="0.5">0.5×</option>
+        <option value="0.75">0.75×</option>
+        <option value="1" selected>1×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+      <button id="fullscreen" type="button">Fullscreen</button>
+      <button id="record" type="button" hidden>Record WebM</button>
+    </div>
+
+    <section class="narration">
+      <span id="narration-label">Narration</span>
+      <p id="narration"></p>
+    </section>
+    <ol class="chapters" id="chapters"></ol>
+    <p class="hint">Space: play / pause (while exploring: pause the simulation) · ← →: seek 5 s · [ ]: previous / next chapter · F: fullscreen · Esc: back to the video</p>
+  </main>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
