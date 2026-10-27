@@ -27,6 +27,8 @@ intuitive.
 | Part 0 · The geometry of shape space 1 | video, about 8 min | shape space: bundles, connections, curvature |
 | Part 1 · Diffusion in the right geometry | video, about 5 min | diffusion: stiffness and the metric |
 | Atlas · Why one chart is not enough | playable video (prototype), about 1.5 min | atlases: why one flat chart is not enough |
+| Bundles · One space, many bundles | video (draft), about 11 min | shape space: global and local symmetries, sections, associated bundles, noise and curvature |
+| Interactions · Parts and poses | video (draft), about 22 min | generative models of several molecules: frozen monomer models, one learned interaction |
 | Torus flow, flattened | explorable | atlases: the same argument as a standalone page |
 
 **Videos** are narrated timelines with chapters, scrubbing and frame-by-frame
@@ -93,6 +95,79 @@ proofs are part of the thesis.
    instead of glued edges (46 s): mass piles against the walls and cannot go
    round, because a flat square has no hole to go around. At 61 s the viewer is
    invited to try it themselves.
+
+**Bundles · One space, many bundles** (draft, about 11 minutes)
+
+The molecule is nitroethane with its CH₃ and CH₂ groups as single beads. It
+has two symmetries: SO(3) rotates the whole molecule, and a rotor U(1) turns the
+two O of its NO₂ group (a '<' shape) about the C–N bond.
+
+1. **Configurations and the orientation fibre.** Every bead is a point of ℝ³.
+   The centre of mass is a canonical global section for translations. Vertical
+   directions walk along the fibre SO(3).
+2. **The rotor.** Turning the two lips is a U(1) action that only moves beads
+   4 and 5. It commutes with rotations, so one space carries the bundles
+   X → M, X → X/U(1) and M → M/U(1) at once.
+3. **Questions.** Is the rotor a bundle (yes, where a lip is off the axis)? Is
+   its base a coarse-grained molecule (no: 3N − 1 dimensions)? Sections: the
+   torsion angle works on reasonable shapes, but no continuous zero exists on
+   all of them (hairy ball, Hopf). There is no global body frame for N ≥ 4.
+4. **The rotor in shape space.** Turning it once with zero angular momentum
+   rotates the molecule by 81° (the bicycle wheel on a swivel chair).
+5. **Associated bundles.** X ×_SO(3) ℝ³ is space as the molecule sees it. The
+   beads are its sections, and the shape space of a whole molecule is a bundle
+   over the shape space of a part. Parallel transport leaves a second molecule
+   at rest in the lab, so seen from the first it turns by the inverse holonomy.
+   One bead fixes an orientation only up to its stabiliser. The rotor's line
+   bundle is the plane perpendicular to the bond (TS² over bond directions),
+   and swinging the bond around a cone turns the lips by the solid angle.
+6. **Noise.** Brownian loops of shapes rotate by zero on average and by
+   (t²/12)|Ω|² in mean square. Through O'Neill's formula this measures the
+   curvature of shape space. Shape noise with zero angular momentum makes a
+   molecule with a free rotor diffuse in orientation.
+
+The rigorous statements, proofs and references are in
+[docs/many-bundles.md](docs/many-bundles.md). A research note on using the
+coupling (associated bundles) to build generative models of several molecules,
+or of one molecule from reusable parts, is in
+[docs/bundle-generative-models.md](docs/bundle-generative-models.md).
+
+**Interactions · Parts and poses** (draft, about 22 minutes)
+
+Water and hydrogen peroxide in a toy force field (300 K), each with a frozen
+diffusion model of its own. Everything drawn is computed when the page loads
+(about 3 s); the spring molecules and the one-dimensional toys are exact.
+
+1. **Background.** A noisy point stands for a cloud of clean configurations; at
+   small noise a score is a force divided by kT. One molecule's score has no net
+   force and no net torque; the shapes are the base of a bundle whose fibres are
+   orbits of turns.
+2. **The picture.** Two molecules leave a six-dimensional relative pose, the
+   fibre of the associated bundle. One diagram carries it from here on: the two
+   own shapes on the floor (water's angle, peroxide's torsion), one pose number
+   u up the fibres, any point popping out as a real pair.
+3. **Just add?** Adding the frozen scores gives molecules that ignore each other
+   (flat fibres). Binding is one extra factor w = e^{−βU_int}: docking peaks on
+   the fibres, induced fit on the floor (checked against a direct simulation),
+   the affinity in total.
+4. **Noise.** The noisy weight W_t is the clean weight averaged over the
+   reference's cloud. The score splits exactly into two frozen monomer arrows, a
+   known spring and one learned interaction arrow with Newton's third law. That
+   arrow is not the force at the noisy point (74 %, 365 % and 2255 % off in the
+   spring toy), so it is learned as one invariant energy: rigid motions and
+   swaps, not mirrors.
+5. **Reuse.** One frozen water model serves every partner; a third molecule shows
+   why no molecule should be the root, and noise turns pair terms into
+   many-body terms. The connection matters only for samplers in bundle
+   coordinates.
+6. **Verdict.** The identity and the small-noise force field are known; the
+   geometry is the contribution; the water dimer showed no data gain, and the
+   alanine dipeptide test (alone and with one water, 400 K MD on the LISE
+   cluster) is running, with no results yet.
+
+The statements and their sources are in
+[docs/bundle-generative-models.md](docs/bundle-generative-models.md); the
+expensive checks of the computed numbers are in `tests/interactions.test.mjs`.
 
 Each video runs in the browser as an interactive player with chapters, scrubbing
 and narration, and can be exported frame by frame to MP4. Everything is plain
@@ -175,7 +250,7 @@ measurements and the plan are in [docs/interactive-video.md](docs/interactive-vi
 
 ```bash
 npm install                      # esbuild (build) and Playwright (tests, export)
-npm run dev                      # http://localhost:5173/?video=part-0 (or part-1, atlas), /explorables/torus-flow.html
+npm run dev                      # http://localhost:5173/?video=part-0 (or part-1, atlas, bundles, interactions), /explorables/torus-flow.html
 npm run build                    # dist/<id>.html: one self-contained file per video; dist/explorables/
 npm test                         # Node tests of the models, then the smoke test (below)
 ```
@@ -220,6 +295,8 @@ src/
     part-0/             meta.json, index.js (the scene list), scenes/, and helpers
     part-1/             the same for Part 1
     atlas/              the same, plus torusFlow.js (the simulation) and torusViews.js (its drawing)
+    bundles/            the same, plus beads.js (extra beads of associated bundles); reuses Part 0's plane bundle
+    interactions/       the same, plus toy.js, data.js (everything computed at load), diagram.js (the master diagram)
 explorables/            standalone interactive pages, copied to dist/explorables/ by the build
 tests/                  Node tests of models (node --test)
 docs/                   design notes

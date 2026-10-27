@@ -13,9 +13,9 @@ export const STACK = { cx: 820, top: 225, rowHeight: 37, width: 160 };
 /**
  * The five per-atom 3-vectors slide together into one 15-vector.
  * t is the time since the stacking started: frames fade 0–0.6 s, rows move 0.3–3.4 s,
- * the big bracket and the atom badges appear 2.8–4.1 s.
+ * the big bracket and the atom badges appear 2.8–4.1 s. colorOf(i) colours atom i's badge.
  */
-export function drawStackedConfiguration(ctx, t, X) {
+export function drawStackedConfiguration(ctx, t, X, colorOf = atomColor) {
   const oldFrames = 1 - seg(t, 0, 0.6);
   for (let i = 0; i < 5; i++) {
     columnFrame(ctx, { cx: COLUMN_SLOTS[i], y0: COLUMN_TOP, count: 3, label: `r${SUBSCRIPT[i + 1]}`, alpha: oldFrames });
@@ -46,7 +46,7 @@ export function drawStackedConfiguration(ctx, t, X) {
     const badge = seg(t, 3 + 0.1 * i, 3.6 + 0.1 * i);
     ctx.save();
     ctx.globalAlpha = badge;
-    dot(ctx, STACK.cx + 102, y, 13, atomColor(i));
+    dot(ctx, STACK.cx + 102, y, 13, colorOf(i));
     text(ctx, String(i + 1), STACK.cx + 102, y + 1, { font: font.mono, size: 15, weight: 600, color: color.bg, align: 'center', baseline: 'middle' });
     ctx.strokeStyle = color.line;
     ctx.lineWidth = 1.5;
