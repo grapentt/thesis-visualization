@@ -63,10 +63,11 @@ export function mountVideo(video) {
   window.video = {
     id: video.id,
     duration: timeline.duration,
-    scenes: timeline.scenes.map(({ name, start, duration, live, levers, controls, beats }) => ({
+    scenes: timeline.scenes.map(({ name, start, duration, narration, live, levers, controls, beats }) => ({
       name,
       start,
       duration,
+      narration,
       live,
       levers,
       beats,
@@ -80,7 +81,7 @@ export function mountVideo(video) {
      * scene. A number as third argument is the height (the earlier signature).
      */
     frame(T, width = 1920, options = {}) {
-      const { height = Math.round((width * STAGE.height) / STAGE.width), view } = typeof options === 'number' ? { height: options } : options;
+      const { height = Math.round((width * STAGE.height) / STAGE.width), view, mimeType = 'image/png', quality } = typeof options === 'number' ? { height: options } : options;
       let live = exportView;
       if (view) {
         const key = viewKey(view);
@@ -95,7 +96,7 @@ export function mountVideo(video) {
       const ctx = exportCanvas.getContext('2d');
       ctx.setTransform(width / STAGE.width, 0, 0, height / STAGE.height, 0, 0);
       timeline.render(ctx, T, live);
-      return exportCanvas.toDataURL('image/png');
+      return exportCanvas.toDataURL(mimeType, quality);
     },
     /** Forget every computed simulation state, so the next frame starts cold. */
     reset() {
