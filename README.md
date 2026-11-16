@@ -30,6 +30,7 @@ intuitive.
 | Bundles · One space, many bundles | video (draft), about 11 min | shape space: global and local symmetries, sections, associated bundles, noise and curvature |
 | Interactions · Parts and poses | video (draft), about 22 min | generative models of several molecules: frozen monomer models, one learned interaction |
 | Covariance · The geometry of fluctuations | video, 30 min 30 s | covariance from first principles, local spread, stiffness, intrinsic curvature |
+| Retention · What the noise should keep | video, 17 min | diffusion: what information geometry adds to the noising process and the model, and what it does not |
 | Torus flow, flattened | explorable | atlases: the same argument as a standalone page |
 
 **Videos** are narrated timelines with chapters, scrubbing and frame-by-frame
@@ -251,7 +252,7 @@ measurements and the plan are in [docs/interactive-video.md](docs/interactive-vi
 
 ```bash
 npm install                      # esbuild (build) and Playwright (tests, export)
-npm run dev                      # http://localhost:5173/?video=part-0 (or part-1, atlas, bundles, interactions), /explorables/torus-flow.html
+npm run dev                      # http://localhost:5173/?video=part-0 (or part-1, atlas, bundles, interactions, covariance, retention), /explorables/torus-flow.html
 npm run build                    # dist/<id>.html: one self-contained file per video; dist/explorables/
 npm test                         # Node tests of the models, then the smoke test (below)
 ```
@@ -278,6 +279,13 @@ npm run export -- --video part-1 --from 219 --to 257 --mp4 problem-3.mp4   # jus
 `--from` and `--to` are in seconds; the start time of each scene is shown in the
 chapter list and available as `window.video.scenes` in the browser console.
 
+To look at a video before exporting it, `scripts/review-frames.mjs` renders frames of
+a built video to PNGs and reports how fast each narration cue has to be read:
+
+```bash
+PLAYWRIGHT_CHANNEL=chrome node scripts/review-frames.mjs --video retention --scene 6 --every 5
+```
+
 ## How it is organised
 
 ```
@@ -298,6 +306,8 @@ src/
     atlas/              the same, plus torusFlow.js (the simulation) and torusViews.js (its drawing)
     bundles/            the same, plus beads.js (extra beads of associated bundles); reuses Part 0's plane bundle
     interactions/       the same, plus toy.js, data.js (everything computed at load), diagram.js (the master diagram)
+    retention/          the same, plus math.js (the harmonic coordinate, the two-basin line, the flow identity, the circle)
+                        and toy.js (the bond–torsion toy and its information-retention engine)
 explorables/            standalone interactive pages, copied to dist/explorables/ by the build
 tests/                  Node tests of models (node --test)
 docs/                   design notes
@@ -779,3 +789,102 @@ count. The exporter verifies every slot's duration to prevent cumulative
 narration drift. It requires macOS `say`, ffmpeg, and a Playwright
 browser; omit `PLAYWRIGHT_CHANNEL=chrome` to use Playwright's Chromium. Export
 options include `--width 1600`, `--fps 24`, and `--voice Samantha`.
+
+## Retention · What the noise should keep
+
+A **17-minute** video (12 scenes) that extends Part 1. Part 1 chose a metric G = K so that
+noise, score and loss respect stiffness. This video asks what information geometry adds to
+that choice and what it does not: a correction (thermal stiffness and the Fisher information
+of the dynamics are different geometries), two criteria beyond covariance whitening
+(*retention*: how information about bonds, widths, torsions and basin populations disappears
+across noise levels; *representation*: whether the diffusion operator acts simply on the
+functions the score model has to represent), the identities behind them, the bolder
+conjectures that should stay separate, and three changes to the research programme. Open
+`dist/retention.html` after building, or choose **Retention** in the local player; export
+the narrated MP4 with `scripts/export-narrated.mjs --video retention`.
+
+Everything on screen is computed from two small models, with no DOM, in
+`src/videos/retention/math.js` and `toy.js`:
+
+- **one harmonic coordinate** dX = −kX dτ + √(2D) dB, with the same diffusivity
+  D = 1 Å²/ps and k = 400 /ps (bond) or 1 /ps (torsion), so the equilibrium widths are
+  0.05 Å and 1 Å and κ = 400 as in Part 1;
+- **a toy molecule** with a stiff bond r (Å) and a torsion φ on a circle with two basins
+  (65 % at −1.0 rad, 35 % at 1.9 rad, width 0.35 rad), the bond's mean 0.015 sin φ Å and
+  width 0.05 (1 + 0.2 cos φ) Å following the torsion; four observables (bond stretch, bond
+  width, torsion within its basin, basin membership) and three noising channels (flat;
+  local thermal widths; global covariance), passed through on an 80 × 56 grid;
+- **the torsion cut open on a line** (two Gaussian basins) for the Gaussianising map
+  φ = Φ⁻¹∘F, the operator L_W and the flow identity; and Brownian motion on the circle.
+
+The scenes:
+
+1. **00:00 · Title.**
+2. **00:20 · Where Part 1 stopped** (75 s). Three problems, one fix G = K; the
+   share-of-signal curves of the bond and the torsion slide onto one curve under whitening;
+   the two open questions.
+3. **01:35 · Two geometries, not one** (120 s). Exact paths of the two coordinates from
+   one start; C_τ = v(1 − e^{−2kτ}), F_τ = 1/(v(e^{2kτ} − 1)) on a log–log plot against
+   the thermal metric 1/v: thermal stiffness magnifies the bond, finite-lag Fisher
+   information suppresses it. The stationary step statistic v(1 − e^{−kτ}) at 1 ps
+   (bond: 100 % of its equilibrium width, torsion: 63 %) is what the learned warp fits: a
+   finite-lag thermal construction, not an estimate of mobility.
+4. **03:35 · Same word, three experiments** (80 s). F_τ = JᵀC⁻¹J + E[rrᵀ] for the
+   dynamics; the posterior Fisher information α²/σ⁴ C^post and the slope of the posterior
+   mean (drawn for the two-basin line at σ = 0.5); every Euclidean pullback as the Fisher
+   metric of z = φ(x) + unit noise.
+5. **04:55 · Information about what?** (85 s). The toy's density, the four observables,
+   and the tilt p_θ ∝ p e^{θ·u} animated along each of them: a shift of the bond, a change
+   of its width, a turn of the torsion inside its basin, a move of population between
+   basins. I₀ = Cov(u).
+6. **06:20 · What the noisy molecule still knows** (95 s). ∂_θ log p_{θ,t}(y) = E[u(X₀) | X_t = y],
+   I_t = Cov(E[u | X_t]) and I₀ − I_t = E[Cov(u | X_t)]: a noisy point, its posterior
+   cloud of clean configurations, the conditional means, and the split of I₀ into retained
+   and erased as the noise grows. The Gaussian case v/(v + σ_t²) is Part 1's curve.
+7. **07:55 · Retention curves** (115 s). R_t of the four observables against the noise
+   multiplier under flat noise (bond first, torsion within its basin next, basin population
+   last), local thermal widths (bond and within-basin torsion together, the basin at about
+   three widths), and the global covariance (the within-basin torsion erased first). No
+   linear rescaling aligns both torsion curves. A diagnostic, not a loss.
+8. **09:50 · What the model must learn** (120 s). r = L_W u + G I⁻¹ u ⊥ u,
+   Γ_SM = I⁻¹ + G⁻¹E[rrᵀ]G⁻¹, efficiency iff L_W u ∈ span(u). On the two-basin line: u = x
+   under W = 1 (ratio 16.6), the Gaussianising map with W = 1/φ′² and u = φ (ratio 1.00,
+   L_W φ = −φ exactly), and the other two cells of the table; the mobility is about 10⁶
+   times larger in the barrier than in the basins.
+9. **11:50 · Whitening the stiff conditional** (75 s). ξ = C(s)^{−1/2}(r − m(s)) carries the
+   samples from the curved band to a straight one; m′ and c′ stay in the Jacobian's
+   off-diagonal entry. Proposed, not established.
+10. **13:05 · Why the loss norm is the noise covariance** (70 s). The data and a wrong
+    model flow under the same diffusion; the drop in KL equals the integrated score error
+    in the mobility norm (0.3446 against 0.3455 on the grid), and the terminal mismatch
+    is what is left.
+11. **14:15 · What this does not say** (85 s). Six claims with their status, and the
+    counterexample: Brownian motion on the circle has zero Ricci curvature and a uniform
+    stationary density, yet F_τ ~ 2e^{−τ} and τF_τ → 0.
+12. **15:40 · Three changes, in order** (80 s). Retention curves in the assessment; maps
+    evaluated jointly with the model; conditional stiff whitening with an explicit soft
+    model; the physical density and force contract fixed throughout.
+
+### Mathematical contract
+
+`tests/retention.test.mjs` checks:
+
+- erf, Φ and Φ⁻¹ against reference values; the harmonic coordinate's F_τ = J_τ²/C_τ with the
+  short- and long-lag limits, the opposite rankings of 1/v and F_τ, the 1 ps step widths,
+  and the exact sample paths' moments;
+- the Gaussianising map sends the two-basin density to N(0, 1); L_W φ = −φ with W = 1/φ′²;
+  the residual is orthogonal to u, E[(L_W u) u] = −G, the residual identity equals the
+  sandwich formula in all four cells, only the matched pair has ratio 1, a single Gaussian
+  with u = x is exactly efficient, and the mobility peaks in the barrier;
+- the flow identity to 2 × 10⁻⁴; the circle's F_τ ≈ 1/τ and 2e^{−τ} with τF_τ decreasing
+  to zero; Tweedie's slope dm/dy = C^post/σ² on the line;
+- the toy grid is a distribution with the designed moments; the separable retention pass
+  equals brute force and I₀ − I_t = E[Cov(u | X_t)] to 10⁻¹²; every curve runs from 1 to 0
+  monotonically with the orderings the narration states; the eigenvalues of R_t lie in
+  [0, 1] and do not change under a linear recombination of the observables; tilting along
+  u_k moves E[u_l] by θ I₀[l][k] to first order; the posterior collapses to the point at
+  tiny noise and to the whole distribution at huge noise; conditional whitening makes ξ
+  standard normal with the coupling in its Jacobian.
+
+The numbers on screen (k, D, the toy's basins and widths) are illustrative; the identities
+are derived in the thesis's theory notes and the Sprint 11 review this video visualises.

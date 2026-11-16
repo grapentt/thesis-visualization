@@ -7,12 +7,13 @@ import part1 from './videos/part-1/index.js';
 import atlas from './videos/atlas/index.js';
 import bundles from './videos/bundles/index.js';
 import covariance from './videos/covariance/index.js';
+import retention from './videos/retention/index.js';
 import interactionsMeta from './videos/interactions/meta.json' with { type: 'json' };
 
 // computes all its data at import (about 3 s): loaded only when it is the requested video
 const interactions = { ...interactionsMeta, load: () => import('./videos/interactions/index.js') };
 
-const videos = [part0, part1, atlas, bundles, interactions, covariance];
+const videos = [part0, part1, atlas, bundles, interactions, covariance, retention];
 const requested = new URLSearchParams(location.search).get('video');
 const video = videos.find((v) => v.id === requested) ?? videos[0];
 mountVideo(video.load ? (await video.load()).default : video);
