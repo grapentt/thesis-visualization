@@ -1,0 +1,1183 @@
+1
+00:00:00,550 --> 00:00:05,844
+The geometry of information. A family of distributions is a space, and this video builds
+
+2
+00:00:05,844 --> 00:00:11,137
+its natural ruler, the Fisher metric, from one question: how hard is it to tell
+
+3
+00:00:11,137 --> 00:00:16,431
+two distributions apart? Then it follows that ruler to a sphere, a hyperbolic plane, the
+
+4
+00:00:16,431 --> 00:00:19,254
+natural gradient and two kinds of straight lines.
+
+5
+00:00:23,550 --> 00:00:28,899
+Start with three families. A coin with bias p: one number, so the family is
+
+6
+00:00:28,899 --> 00:00:34,247
+an interval. A three-sided die: three probabilities that sum to one, a triangle. A Gaussian
+
+7
+00:00:34,247 --> 00:00:39,596
+with mean mu and width sigma: a half-plane. Every point of these shapes is a
+
+8
+00:00:39,596 --> 00:00:40,665
+whole probability distribution.
+
+9
+00:00:44,800 --> 00:00:49,474
+Move a point and the distribution moves with it. The coordinates are convenient labels, nothing
+
+10
+00:00:49,474 --> 00:00:54,148
+more. We could label the same coins by their log-odds instead, and the interval would
+
+11
+00:00:54,148 --> 00:00:55,706
+stretch to the whole line.
+
+12
+00:01:03,550 --> 00:01:08,501
+That is the problem. Two coins five hundredths apart in p are two tenths apart
+
+13
+00:01:08,501 --> 00:01:13,452
+in log-odds near the middle, and one point three apart near the edge. Coordinates do
+
+14
+00:01:13,452 --> 00:01:18,072
+not measure anything. A distance between distributions has to come from the distributions themselves.
+
+15
+00:01:24,800 --> 00:01:30,137
+Information geometry's answer is a ruler built from distinguishability: how well can data tell two
+
+16
+00:01:30,137 --> 00:01:35,475
+nearby distributions apart? That ruler is the Fisher metric, and the rest of this video
+
+17
+00:01:35,475 --> 00:01:36,186
+follows it.
+
+18
+00:01:41,050 --> 00:01:46,433
+Before comparing coins, watch where these count distributions come from. Take a coin with p
+
+19
+00:01:46,433 --> 00:01:51,815
+equal to one half and flip it a hundred times: gold for heads, grey for
+
+20
+00:01:51,815 --> 00:01:57,198
+tails. Count the heads: here, forty-three. Do it again: forty-four. And again: forty-eight. Each run
+
+21
+00:01:57,198 --> 00:02:02,580
+of a hundred flips gives one number, and the numbers differ, because the flips are
+
+22
+00:02:02,580 --> 00:02:02,939
+random.
+
+23
+00:02:14,650 --> 00:02:19,378
+Repeat the run two thousand times and tally the counts. The tally settles into a
+
+24
+00:02:19,378 --> 00:02:24,107
+hill: most runs give close to fifty heads, a run with forty or sixty is
+
+25
+00:02:24,107 --> 00:02:28,835
+rare, thirty almost never happens. The exact shape is the binomial distribution, drawn as the
+
+26
+00:02:28,835 --> 00:02:32,618
+curve, and for a hundred flips it is close to a Gaussian.
+
+27
+00:02:42,250 --> 00:02:46,664
+What sets the width of the hill? One flip is a yes-or-no with mean p
+
+28
+00:02:46,664 --> 00:02:51,079
+and variance p times one minus p. A hundred independent flips add their variances, so
+
+29
+00:02:51,079 --> 00:02:55,493
+the count has variance a hundred times p times one minus p, and its standard
+
+30
+00:02:55,493 --> 00:02:59,907
+deviation is the square root of that. At p equal one half, that is five
+
+31
+00:02:59,907 --> 00:03:00,201
+heads.
+
+32
+00:03:12,250 --> 00:03:16,784
+Near p equal to zero the coin almost always shows tails, so the count hardly
+
+33
+00:03:16,784 --> 00:03:21,318
+varies: at p equal point oh two the standard deviation is one point four heads.
+
+34
+00:03:21,318 --> 00:03:25,851
+A fair coin is the most unpredictable coin there is; a lopsided coin is nearly
+
+35
+00:03:25,851 --> 00:03:30,385
+deterministic. The spread is a property of the coin, not of the scale of the
+
+36
+00:03:30,385 --> 00:03:33,408
+picture: here both hills are drawn on the same axis.
+
+37
+00:03:42,250 --> 00:03:45,904
+Here is the whole family on one axis. As p runs from zero to one,
+
+38
+00:03:45,904 --> 00:03:49,558
+the hill slides from the left edge to the right, narrow at both ends and
+
+39
+00:03:49,558 --> 00:03:53,212
+widest in the middle. Keep this in mind for the next scene: a step in
+
+40
+00:03:53,212 --> 00:03:56,866
+p moves the hill by the same number of heads everywhere, but the hills it
+
+41
+00:03:56,866 --> 00:04:00,032
+has to clear are wide in the middle and narrow at the edges.
+
+42
+00:04:14,650 --> 00:04:20,015
+Now compare coins. Two coins near the middle, p equal point five and point five
+
+43
+00:04:20,015 --> 00:04:25,380
+five, a hundred flips each. On the same axis as before, here are their two
+
+44
+00:04:25,380 --> 00:04:30,745
+count hills: both wide, five heads apart, overlapping almost entirely. A hundred flips can barely
+
+45
+00:04:30,745 --> 00:04:32,176
+tell these coins apart.
+
+46
+00:04:39,950 --> 00:04:44,957
+Two coins near the edge, p equal point oh two and point oh seven. The
+
+47
+00:04:44,957 --> 00:04:49,964
+same step of five hundredths, the same hundred flips, the same axis. These hills are
+
+48
+00:04:49,964 --> 00:04:54,970
+narrow, so the same five heads of separation leaves them almost disjoint: two heads against
+
+49
+00:04:54,970 --> 00:04:59,977
+seven, visible at a glance. The two zooms below show each pair in detail, each
+
+50
+00:04:59,977 --> 00:05:01,312
+at its own magnification.
+
+51
+00:05:09,650 --> 00:05:14,134
+Measure the step in units of the hills' own width, the standard deviation. Near the
+
+52
+00:05:14,134 --> 00:05:18,618
+middle the width is five heads, so the step is one standard deviation. Near the
+
+53
+00:05:18,618 --> 00:05:23,102
+edge the width is about two heads, so the same step is about two and
+
+54
+00:05:23,102 --> 00:05:27,586
+a half. The same coordinate step buys very different amounts of evidence, and the exchange
+
+55
+00:05:27,586 --> 00:05:29,379
+rate depends on where you stand.
+
+56
+00:05:39,350 --> 00:05:43,692
+That exchange rate is the Fisher information. Divide the step in heads by the width
+
+57
+00:05:43,692 --> 00:05:48,034
+of the hill: n delta p over root n p one minus p, which is
+
+58
+00:05:48,034 --> 00:05:52,377
+root n times delta p over root p one minus p. The factor that depends
+
+59
+00:05:52,377 --> 00:05:56,719
+on the coin, one over p one minus p, is g of p: four in
+
+60
+00:05:56,719 --> 00:06:01,061
+the middle, fifty-one near the edge. It is the local ruler of the family. The
+
+61
+00:06:01,061 --> 00:06:05,403
+number of standard deviations between two nearby coins after n flips is root n g
+
+62
+00:06:05,403 --> 00:06:06,272
+times delta p.
+
+63
+00:06:18,950 --> 00:06:23,626
+A ruler that changes from place to place is exactly what a Riemannian metric is.
+
+64
+00:06:23,626 --> 00:06:25,808
+Next: what this ruler is made of.
+
+65
+00:06:29,950 --> 00:06:34,663
+Now take the ruler apart. A statistical model is a table: for every value of
+
+66
+00:06:34,663 --> 00:06:39,375
+the parameter theta, one probability distribution over the outcomes x. Write it p of x
+
+67
+00:06:39,375 --> 00:06:44,088
+given theta: the probability of seeing x if the coin is theta. For one flip
+
+68
+00:06:44,088 --> 00:06:48,801
+the outcomes are heads and tails; p of heads given theta is theta, and p
+
+69
+00:06:48,801 --> 00:06:53,513
+of tails given theta is one minus theta. Slide theta and the two probabilities change.
+
+70
+00:07:02,350 --> 00:07:06,968
+For a hundred flips the outcome is the number of heads, and p of k
+
+71
+00:07:06,968 --> 00:07:11,585
+given theta is the binomial hill of the previous scene, centred at a hundred theta.
+
+72
+00:07:11,585 --> 00:07:14,971
+One parameter value, one hill; slide theta and the hill slides.
+
+73
+00:07:21,550 --> 00:07:26,531
+Now turn the table around. Fix what you saw and ask how probable it was
+
+74
+00:07:26,531 --> 00:07:31,511
+under each theta. That function of theta is the likelihood. You saw heads: the likelihood
+
+75
+00:07:31,511 --> 00:07:36,492
+is theta itself, a straight line rising to one. You saw tails: one minus theta,
+
+76
+00:07:36,492 --> 00:07:36,824
+falling.
+
+77
+00:07:41,950 --> 00:07:46,206
+Take logarithms. The log-likelihood of heads is log theta, and its slope at theta equal
+
+78
+00:07:46,206 --> 00:07:50,462
+p is one over p: that is the score of heads, s of H at
+
+79
+00:07:50,462 --> 00:07:54,717
+p. For tails the slope of log one minus theta is minus one over one
+
+80
+00:07:54,717 --> 00:07:58,973
+minus p: the score of tails. H and T are nothing more than the two
+
+81
+00:07:58,973 --> 00:08:03,229
+outcomes. A score is a slope: how fast the log-probability of what you saw changes
+
+82
+00:08:03,229 --> 00:08:04,647
+as you move the parameter.
+
+83
+00:08:22,750 --> 00:08:27,363
+Why the logarithm? The slope of log p is the change of p divided by
+
+84
+00:08:27,363 --> 00:08:31,977
+p: the relative change. That is what evidence is made of. One more percentage point
+
+85
+00:08:31,977 --> 00:08:36,590
+of probability is a small matter when p is one half, and a doubling when
+
+86
+00:08:36,590 --> 00:08:41,204
+p is one in a hundred. Second, independent observations multiply their probabilities, so their logarithms
+
+87
+00:08:41,204 --> 00:08:45,817
+add, and the score of a hundred flips is simply the sum of a hundred
+
+88
+00:08:45,817 --> 00:08:50,431
+single-flip scores: k over p minus n minus k over one minus p. Each flip
+
+89
+00:08:50,431 --> 00:08:52,276
+votes, and the votes add up.
+
+90
+00:09:08,350 --> 00:09:13,487
+Third, the Gaussian. Its log-density is a parabola, minus x minus mu squared over two
+
+91
+00:09:13,487 --> 00:09:18,623
+sigma squared, so the score in mu is x minus mu over sigma squared: the
+
+92
+00:09:18,623 --> 00:09:23,760
+observation's distance from the mean, in units of the variance. The logarithm turns the bell
+
+93
+00:09:23,760 --> 00:09:26,499
+into the parabola whose curvature is the information.
+
+94
+00:09:34,750 --> 00:09:39,494
+One more property. At the true coin the average score is zero. Heads pushes up
+
+95
+00:09:39,494 --> 00:09:44,238
+by one over p, and happens with probability p; tails pushes down by one over
+
+96
+00:09:44,238 --> 00:09:48,982
+one minus p, with probability one minus p. The two pushes cancel exactly. That is
+
+97
+00:09:48,982 --> 00:09:53,726
+no accident: the probabilities of all outcomes sum to one for every theta, so their
+
+98
+00:09:53,726 --> 00:09:58,470
+derivatives sum to zero. On average the data push neither way, but they do push,
+
+99
+00:09:58,470 --> 00:10:01,316
+and how hard they push is the next scene.
+
+100
+00:10:13,150 --> 00:10:17,892
+The score of one observation pushes theta up or down, and at the true coin
+
+101
+00:10:17,892 --> 00:10:22,634
+the pushes average to zero. The Fisher information measures how hard they push: the mean
+
+102
+00:10:22,634 --> 00:10:27,376
+of the squared score, which is its variance. Take the coin p equal point three.
+
+103
+00:10:27,376 --> 00:10:32,118
+Heads contributes one over p squared, with probability p; tails one over one minus p
+
+104
+00:10:32,118 --> 00:10:36,860
+squared, with probability one minus p. Add the two: one over p plus one over
+
+105
+00:10:36,860 --> 00:10:41,601
+one minus p, which is one over p times one minus p. Four point seven
+
+106
+00:10:41,601 --> 00:10:46,343
+six here, four at p equal one half, fifty-one at p equal point oh two.
+
+107
+00:10:58,650 --> 00:11:02,939
+Scores of independent flips add, and the variance of a sum of independent terms is
+
+108
+00:11:02,939 --> 00:11:07,228
+the sum of the variances, so a hundred flips carry a hundred times the information
+
+109
+00:11:07,228 --> 00:11:11,518
+of one. That is the root n g of the earlier scene: the information of
+
+110
+00:11:11,518 --> 00:11:15,807
+n flips is n times g, and the number of standard deviations in a step
+
+111
+00:11:15,807 --> 00:11:17,809
+is its square root times delta p.
+
+112
+00:11:36,350 --> 00:11:41,696
+Second form. Fix the true coin, p zero equal point three, and ask how good
+
+113
+00:11:41,696 --> 00:11:47,042
+each candidate theta is on average. For each theta take the log-likelihood of heads and
+
+114
+00:11:47,042 --> 00:11:52,389
+of tails, weight them by the true probabilities, point three and point seven, and average.
+
+115
+00:11:52,389 --> 00:11:57,379
+As theta sweeps across, the weighted average traces the lavender curve: the expected log-likelihood.
+
+116
+00:12:08,850 --> 00:12:13,590
+The curve peaks at the truth: on average no other coin explains the data better
+
+117
+00:12:13,590 --> 00:12:18,331
+than the true one. Its slope at the peak is the mean score, zero. Its
+
+118
+00:12:18,331 --> 00:12:23,071
+curvature at the peak is minus the Fisher information. Here is why. The mean score
+
+119
+00:12:23,071 --> 00:12:27,811
+is zero for every theta; differentiate that statement with respect to theta. Two terms appear:
+
+120
+00:12:27,811 --> 00:12:32,551
+the derivative of the probabilities times the score, which is the squared score, and the
+
+121
+00:12:32,551 --> 00:12:37,292
+probabilities times the derivative of the score. Their sum is zero, so the variance of
+
+122
+00:12:37,292 --> 00:12:42,032
+the score equals minus the expected second derivative of the log-likelihood. A sharp peak pins
+
+123
+00:12:42,032 --> 00:12:44,876
+the parameter down; a flat one leaves it loose.
+
+124
+00:13:00,850 --> 00:13:05,892
+Third form. Flip the curve. The gap between the expected log-likelihood at the truth and
+
+125
+00:13:05,892 --> 00:13:10,934
+at theta is the Kullback–Leibler divergence from p zero to theta: the average log-likelihood ratio
+
+126
+00:13:10,934 --> 00:13:15,977
+per observation, how much better the truth explains its own data than theta does. It
+
+127
+00:13:15,977 --> 00:13:21,019
+is zero at the truth, flat there, and rises like one half g times theta
+
+128
+00:13:21,019 --> 00:13:26,061
+minus p zero squared. The Fisher information is the curvature of KL at coincidence, and
+
+129
+00:13:26,061 --> 00:13:28,750
+every f-divergence shares it up to a constant.
+
+130
+00:13:38,550 --> 00:13:43,201
+Three forms of one quantity: the variance of the score, the expected curvature of the
+
+131
+00:13:43,201 --> 00:13:47,851
+log-likelihood, and the quadratic part of KL. All three were computed in the coordinate p.
+
+132
+00:13:47,851 --> 00:13:52,502
+Change coordinates, to the log-odds say, and the score changes like a slope does, so
+
+133
+00:13:52,502 --> 00:13:57,152
+the variance changes by the square of the conversion factor. What does not change is
+
+134
+00:13:57,152 --> 00:14:01,493
+the length of a path measured with it, and that is the next scene.
+
+135
+00:14:12,350 --> 00:14:16,721
+Fisher information is not a number attached to a distribution; it depends on the coordinates.
+
+136
+00:14:16,721 --> 00:14:21,092
+Change from p to the log-odds x and it changes by the square of dp
+
+137
+00:14:21,092 --> 00:14:25,464
+by dx, as a metric tensor must. What does not change is the length of
+
+138
+00:14:25,464 --> 00:14:29,835
+a path, the integral of root g along it: from p equal point one to
+
+139
+00:14:29,835 --> 00:14:33,040
+point seven it is one point three four in either coordinate.
+
+140
+00:14:42,950 --> 00:14:47,694
+For the coin there is a coordinate in which the ruler is constant. Take phi
+
+141
+00:14:47,694 --> 00:14:52,439
+equal to two arcsine root p. Then d phi squared is g d p squared:
+
+142
+00:14:52,439 --> 00:14:57,183
+in phi, equally distinguishable coins are equally spaced, and the whole family, from p zero
+
+143
+00:14:57,183 --> 00:14:58,764
+to one, has length pi.
+
+144
+00:15:08,450 --> 00:15:12,726
+Here is why. Send the coin to the point two root p, two root one
+
+145
+00:15:12,726 --> 00:15:17,003
+minus p, on the circle of radius two. The Fisher metric is the arc length
+
+146
+00:15:17,003 --> 00:15:21,279
+of that circle, and the Fisher–Rao distance between two coins is an angle: two arccos
+
+147
+00:15:21,279 --> 00:15:24,700
+of root p q plus root one minus p one minus q.
+
+148
+00:15:33,950 --> 00:15:39,232
+Now count. After n flips, coins one standard deviation apart sit one over root n
+
+149
+00:15:39,232 --> 00:15:44,514
+apart in phi. So a hundred flips can tell apart about thirty-one coins along the
+
+150
+00:15:44,514 --> 00:15:49,797
+whole family, and in p they crowd towards zero and one. That is Wootters' reading
+
+151
+00:15:49,797 --> 00:15:52,614
+of the metric: Fisher–Rao distance counts distinguishable distributions.
+
+152
+00:16:01,150 --> 00:16:05,616
+Keep this picture. The Fisher metric is the arc length of a sphere in disguise,
+
+153
+00:16:05,616 --> 00:16:07,998
+and with three outcomes the disguise comes off.
+
+154
+00:16:14,750 --> 00:16:18,958
+Three outcomes. The dice fill a triangle, and the Fisher metric at each point is
+
+155
+00:16:18,958 --> 00:16:23,166
+the sum over outcomes of d p i squared over p i. Here are balls
+
+156
+00:16:23,166 --> 00:16:27,374
+of one Fisher radius at different places: round in the middle, flattened against the edges
+
+157
+00:16:27,374 --> 00:16:31,582
+and crushed into the corners, where a small change of a rare outcome is a
+
+158
+00:16:31,582 --> 00:16:32,143
+big step.
+
+159
+00:16:41,950 --> 00:16:46,817
+Now stretch each coordinate to twice its square root. The triangle bends into the positive
+
+160
+00:16:46,817 --> 00:16:51,683
+eighth of a sphere of radius two, and in these coordinates the Fisher metric is
+
+161
+00:16:51,683 --> 00:16:56,225
+the ordinary round metric. The flattened balls become round caps, all of one size.
+
+162
+00:17:09,150 --> 00:17:14,021
+So the geometry of three-sided dice is spherical. Geodesics are great circles. The Fisher–Rao distance
+
+163
+00:17:14,021 --> 00:17:18,891
+between two dice is two arccos of the sum of root p i q i,
+
+164
+00:17:18,891 --> 00:17:23,762
+an angle again, never more than pi. And the straight chord between the same two
+
+165
+00:17:23,762 --> 00:17:26,684
+points is, up to a constant, the Hellinger distance.
+
+166
+00:17:36,350 --> 00:17:40,918
+Back in the triangle the geodesic bows toward the centre; the straight segment between the
+
+167
+00:17:40,918 --> 00:17:45,487
+two dice is longer. The straight segment is not wrong, though: it is the mixture
+
+168
+00:17:45,487 --> 00:17:50,055
+of the two dice, a geodesic of a different, flat geometry that returns at the
+
+169
+00:17:50,055 --> 00:17:51,273
+end of the video.
+
+170
+00:18:00,350 --> 00:18:05,870
+One picture to keep: probabilities live on a sphere, and distinguishability is the angle between
+
+171
+00:18:05,870 --> 00:18:06,238
+them.
+
+172
+00:18:19,550 --> 00:18:24,787
+Why this ruler and not another? Here are two dice on the triangle, zero point
+
+173
+00:18:24,787 --> 00:18:30,025
+nine seven apart. Relabel the outcomes, turning the triangle onto itself, and nothing changes: the
+
+174
+00:18:30,025 --> 00:18:35,262
+metric does not care which face is called one. Now merge outcomes two and three:
+
+175
+00:18:35,262 --> 00:18:39,452
+each die becomes a coin, and the triangle collapses onto one edge.
+
+176
+00:18:47,450 --> 00:18:52,334
+The two coins are zero point one one apart. Merging threw away exactly the information
+
+177
+00:18:52,334 --> 00:18:57,219
+that told these dice apart, and the distance shrank with it. In general a statistic
+
+178
+00:18:57,219 --> 00:19:01,777
+can only shrink Fisher–Rao distances, and it keeps them exactly when it is sufficient.
+
+179
+00:19:10,700 --> 00:19:16,080
+Go the other way: split outcome three into two sub-outcomes in fixed proportions. The dice
+
+180
+00:19:16,080 --> 00:19:21,461
+gain a face but no information, and the distance is unchanged: zero point nine seven
+
+181
+00:19:21,461 --> 00:19:26,841
+again. Chentsov's theorem, from 1972, says that a metric defined on all the simplices and
+
+182
+00:19:26,841 --> 00:19:32,222
+invariant under every such splitting is a constant multiple of the Fisher metric. There is
+
+183
+00:19:32,222 --> 00:19:33,657
+no other invariant ruler.
+
+184
+00:19:40,150 --> 00:19:44,828
+The theorem extends to general sample spaces and to densities on manifolds, and it has
+
+185
+00:19:44,828 --> 00:19:49,506
+a twin for connections that we meet at the end. The Fisher metric is not
+
+186
+00:19:49,506 --> 00:19:54,183
+a convention. It is forced by asking that distances between distributions mean the same thing
+
+187
+00:19:54,183 --> 00:19:55,743
+whatever we call the outcomes.
+
+188
+00:20:01,850 --> 00:20:06,778
+Gaussians, with mean mu and width sigma. The Fisher metric is one over sigma squared
+
+189
+00:20:06,778 --> 00:20:11,705
+along mu and two over sigma squared along sigma: both shrink as the width grows.
+
+190
+00:20:11,705 --> 00:20:16,633
+Here are Fisher circles of one size across the half-plane. Near the bottom, where distributions
+
+191
+00:20:16,633 --> 00:20:21,561
+are narrow, a tiny shift is a big step; high up, wide Gaussians barely notice
+
+192
+00:20:21,561 --> 00:20:22,547
+the same shift.
+
+193
+00:20:29,400 --> 00:20:34,591
+Rescale mu by root two and this is the Poincaré half-plane, up to a factor
+
+194
+00:20:34,591 --> 00:20:39,782
+two: a surface of constant negative curvature, minus one half, as Hotelling noticed as early
+
+195
+00:20:39,782 --> 00:20:44,974
+as 1929. Geodesics are the half-ellipses that stand on the mu axis, and the distance
+
+196
+00:20:44,974 --> 00:20:46,358
+has a closed form.
+
+197
+00:20:52,600 --> 00:20:57,427
+So the shortest path between two narrow Gaussians far apart is not the straight segment.
+
+198
+00:20:57,427 --> 00:21:02,255
+It climbs: it widens the distribution, slides it across while it is wide and cheap
+
+199
+00:21:02,255 --> 00:21:06,117
+to move, and narrows it again. The bells below trace that path.
+
+200
+00:21:14,350 --> 00:21:19,374
+Widen the second Gaussian and the distance drops; move its mean and the geodesic bends
+
+201
+00:21:19,374 --> 00:21:24,397
+to follow. The two sliders under the video are yours at any time: this scene
+
+202
+00:21:24,397 --> 00:21:29,421
+is computed live. And note the contrast with optimal transport: in the Wasserstein geometry this
+
+203
+00:21:29,421 --> 00:21:34,445
+half-plane is flat and the straight segment wins. Fisher–Rao pays for distinguishability, not for how
+
+204
+00:21:34,445 --> 00:21:35,784
+far the mass moves.
+
+205
+00:21:43,350 --> 00:21:48,305
+Unlike the sphere of the simplex, this plane is unbounded: two unit Gaussians a hundred
+
+206
+00:21:48,305 --> 00:21:53,261
+apart are about twelve units apart, and the distance grows only logarithmically with the gap.
+
+207
+00:22:06,550 --> 00:22:11,778
+What does the ruler buy? First, resolution. Estimate a die from a hundred rolls, many
+
+208
+00:22:11,778 --> 00:22:17,006
+times over, and the estimates scatter around the truth. The Cramér–Rao bound says no unbiased
+
+209
+00:22:17,006 --> 00:22:22,233
+estimator scatters less than the inverse Fisher metric divided by n, and the sample frequencies
+
+210
+00:22:22,233 --> 00:22:27,461
+attain it. The one-sigma cloud of estimates is exactly the Fisher ball of radius one
+
+211
+00:22:27,461 --> 00:22:28,507
+over root n.
+
+212
+00:22:37,550 --> 00:22:42,772
+So the balls of the earlier scenes were pictures of estimation error: large where distributions
+
+213
+00:22:42,772 --> 00:22:47,993
+are hard to tell apart, small where they are easy. The bound is an inequality
+
+214
+00:22:47,993 --> 00:22:53,215
+between tensors: change coordinates and both sides transform together, which is why it holds in
+
+215
+00:22:53,215 --> 00:22:53,911
+every parametrisation.
+
+216
+00:23:02,350 --> 00:23:06,666
+Second, a prior. Jeffreys asked for a prior that does not depend on the parametrisation,
+
+217
+00:23:06,666 --> 00:23:10,983
+and the answer is the Riemannian volume of the Fisher metric, root det g. For
+
+218
+00:23:10,983 --> 00:23:15,299
+the coin it is one over pi root p one minus p: piled up near
+
+219
+00:23:15,299 --> 00:23:19,615
+zero and one in p, flat in the angle phi. For the die it is
+
+220
+00:23:19,615 --> 00:23:20,766
+uniform on the sphere.
+
+221
+00:23:30,250 --> 00:23:34,799
+Resolution and volume are the metric read two ways. A ball of Fisher radius one
+
+222
+00:23:34,799 --> 00:23:39,348
+over root n is what n observations can resolve, and the number of such balls
+
+223
+00:23:39,348 --> 00:23:43,897
+that fit in a model is its Jeffreys volume: the complexity term of minimum description
+
+224
+00:23:43,897 --> 00:23:44,201
+length.
+
+225
+00:23:55,050 --> 00:23:59,842
+Now use the ruler to learn. Fit a Gaussian to a target by minimising the
+
+226
+00:23:59,842 --> 00:24:04,634
+KL divergence. Plain gradient descent asks which step of fixed coordinate length lowers the loss
+
+227
+00:24:04,634 --> 00:24:09,427
+most. But coordinate length means nothing here, and the plain gradient in mu carries a
+
+228
+00:24:09,427 --> 00:24:14,219
+factor one over sigma squared: huge when the fit is narrow, tiny when it is
+
+229
+00:24:14,219 --> 00:24:14,538
+wide.
+
+230
+00:24:21,150 --> 00:24:26,097
+Ask instead for the step of fixed Fisher length, and the answer is the inverse
+
+231
+00:24:26,097 --> 00:24:31,044
+metric times the gradient: Amari's natural gradient. It is the same vector in every parametrisation,
+
+232
+00:24:31,044 --> 00:24:35,991
+and for this loss its mu component is simply mu minus mu star, whatever sigma
+
+233
+00:24:35,991 --> 00:24:36,321
+is.
+
+234
+00:24:42,900 --> 00:24:47,814
+Start narrow and far from the target. Plain descent with step size point three overshoots
+
+235
+00:24:47,814 --> 00:24:52,728
+at once: sigma jumps to twenty-four, mu to minus point six, and the fit never
+
+236
+00:24:52,728 --> 00:24:57,642
+recovers. With step size point oh two it is safe, and after sixty steps it
+
+237
+00:24:57,642 --> 00:25:01,246
+is still nowhere near. No single step size serves both regimes.
+
+238
+00:25:07,550 --> 00:25:12,949
+The natural gradient with step size point three widens first, slides across while wide, and
+
+239
+00:25:12,949 --> 00:25:18,348
+narrows onto the target in about fifteen steps: the geodesic's strategy, found without knowing the
+
+240
+00:25:18,348 --> 00:25:23,746
+geodesic. In the limit of small steps its path is a straight line in the
+
+241
+00:25:23,746 --> 00:25:29,145
+expectation coordinates, mu and mu squared plus sigma squared: a geodesic of the second, flat
+
+242
+00:25:29,145 --> 00:25:29,505
+geometry.
+
+243
+00:25:36,550 --> 00:25:41,928
+Steepest descent means nothing without a metric. With the Fisher metric the descent happens in
+
+244
+00:25:41,928 --> 00:25:45,155
+the space of distributions, and the parametrisation drops out.
+
+245
+00:25:59,750 --> 00:26:04,822
+There is more structure than the metric. On the simplex two other kinds of line
+
+246
+00:26:04,822 --> 00:26:09,895
+are natural. Mixtures: the straight segment from p to q, with weights one minus s
+
+247
+00:26:09,895 --> 00:26:14,967
+and s. Exponential arcs: straight in log probabilities, the geometric mixtures p to the one
+
+248
+00:26:14,967 --> 00:26:20,040
+minus s times q to the s, renormalised. And between them the Fisher–Rao geodesic, the
+
+249
+00:26:20,040 --> 00:26:20,716
+great circle.
+
+250
+00:26:29,450 --> 00:26:34,674
+Each kind is straight in its own chart. Write the die as an exponential family:
+
+251
+00:26:34,674 --> 00:26:39,898
+natural parameters theta, the log-odds against the third face, and log-partition psi. In the theta
+
+252
+00:26:39,898 --> 00:26:45,122
+plane the exponential arcs are straight and the mixtures bend. In the probability triangle, the
+
+253
+00:26:45,122 --> 00:26:48,256
+mean parameters eta, it is the other way round.
+
+254
+00:26:59,150 --> 00:27:04,136
+The two charts are Legendre dual. Eta is the gradient of psi; theta is the
+
+255
+00:27:04,136 --> 00:27:09,121
+gradient of the dual potential phi, which is minus the entropy; and the Fisher metric
+
+256
+00:27:09,121 --> 00:27:14,107
+is the Hessian of either, g in theta, its inverse in eta. That is why,
+
+257
+00:27:14,107 --> 00:27:18,760
+for an exponential family, the Fisher metric is the covariance of the sufficient statistic.
+
+258
+00:27:28,850 --> 00:27:33,893
+Amari's reading: the two kinds of straight line are geodesics of two flat connections, e
+
+259
+00:27:33,893 --> 00:27:38,935
+and m, dual with respect to the Fisher metric: the derivative of an inner product
+
+260
+00:27:38,935 --> 00:27:43,978
+splits into an e-derivative of one factor and an m-derivative of the other. Their average
+
+261
+00:27:43,978 --> 00:27:49,020
+is the Levi-Civita connection of the sphere, which is curved. That is a dually flat
+
+262
+00:27:49,020 --> 00:27:54,063
+space, and Chentsov's twin theorem makes these connections, with the alpha-family between them, the only
+
+263
+00:27:54,063 --> 00:27:54,735
+invariant ones.
+
+264
+00:28:01,850 --> 00:28:07,225
+Three kinds of straight line, one metric, and a duality between two charts. The payoff
+
+265
+00:28:07,225 --> 00:28:09,375
+is a Pythagorean theorem for KL.
+
+266
+00:28:18,350 --> 00:28:23,125
+Legendre duality gives a divergence for free: the Bregman divergence of psi, the gap between
+
+267
+00:28:23,125 --> 00:28:27,899
+psi and its tangent plane. For an exponential family it is the KL divergence with
+
+268
+00:28:27,899 --> 00:28:32,674
+the arguments swapped. It is not symmetric and not a distance, but to second order
+
+269
+00:28:32,674 --> 00:28:36,176
+it is one half of the Fisher metric, as we saw.
+
+270
+00:28:44,750 --> 00:28:48,926
+And it obeys a Pythagorean theorem. Take a mixture segment from p to q and
+
+271
+00:28:48,926 --> 00:28:53,103
+an exponential arc from q to r that meet at a right angle at q,
+
+272
+00:28:53,103 --> 00:28:57,279
+measured by the Fisher metric. Then KL of p from r equals KL of p
+
+273
+00:28:57,279 --> 00:29:01,455
+from q plus KL of q from r. With numbers: point one two four plus
+
+274
+00:29:01,455 --> 00:29:03,961
+point two four zero equals point three six four.
+
+275
+00:29:14,450 --> 00:29:19,820
+The consequence is a projection theorem. Extend the exponential arc into a whole e-flat line
+
+276
+00:29:19,820 --> 00:29:25,190
+and plot KL from p along it: it is minimised exactly at the foot q
+
+277
+00:29:25,190 --> 00:29:30,561
+of the perpendicular. Minimising KL from a fixed p over an exponential family is an
+
+278
+00:29:30,561 --> 00:29:35,931
+m-projection, unique by convexity. Maximum likelihood is this projection, of the empirical distribution onto the
+
+279
+00:29:35,931 --> 00:29:36,289
+model.
+
+280
+00:29:44,150 --> 00:29:49,823
+The EM algorithm is two such projections alternating: an e-projection of the current model onto
+
+281
+00:29:49,823 --> 00:29:55,497
+the data manifold, which computes the posterior over the hidden variables, then an m-projection back
+
+282
+00:29:55,497 --> 00:30:01,170
+onto the model, which maximises the complete-data likelihood. Each step is the foot of a
+
+283
+00:30:01,170 --> 00:30:03,061
+perpendicular, and KL never increases.
+
+284
+00:30:07,250 --> 00:30:11,061
+So the geometry has two flat charts and a Pythagoras between them.
+
+285
+00:30:20,450 --> 00:30:25,976
+So, end to end. Distances between distributions come from distinguishability, and the local exchange rate
+
+286
+00:30:25,976 --> 00:30:31,501
+between a parameter step and evidence is the Fisher metric: the variance of the score,
+
+287
+00:30:31,501 --> 00:30:35,185
+the curvature of the likelihood, the quadratic part of KL.
+
+288
+00:30:38,450 --> 00:30:42,975
+On the simplex that metric is the round metric of a sphere, reached by taking
+
+289
+00:30:42,975 --> 00:30:46,897
+square roots, so distance is an angle and the Jeffreys prior is uniform.
+
+290
+00:30:53,450 --> 00:30:58,697
+On the Gaussians it is a hyperbolic plane, where geodesics widen before they move; the
+
+291
+00:30:58,697 --> 00:31:02,895
+same metric sets the resolution of estimation and defines the natural gradient.
+
+292
+00:31:09,950 --> 00:31:15,418
+It is the only metric that is invariant under relabelling and never inflated by coarse-graining:
+
+293
+00:31:15,418 --> 00:31:16,147
+Chentsov's theorem.
+
+294
+00:31:23,450 --> 00:31:29,644
+And beneath it lie two flat charts, natural and expectation parameters, Legendre dual, whose straight
+
+295
+00:31:29,644 --> 00:31:35,838
+lines meet at right angles in a Pythagorean theorem for KL. Distributions as points, distinguishability
+
+296
+00:31:35,838 --> 00:31:39,142
+as distance: that is the geometry of information.
