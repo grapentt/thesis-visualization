@@ -1,0 +1,27 @@
+{
+  "schema": "thesis-asset-v1",
+  "id": "A19",
+  "created": "2026-11-19",
+  "notes": "Half-erasure levels t½ of BBA observables per chart. 'best' = note 27 §5's best-estimator envelope (PR #1055, 2026-11-12): lower bounds, drawn with ≥. 'block' = block-alone lower bounds of the loud block (lab 2026-11-16). 'first' = first-order linear rule (lab 2026-11-18; from bba-charts.json, not copied here). C3 Rg canon 0.27–0.28 (g4 §4.2), drawn at 0.275 with a range bar.",
+  "data": {
+    "charts": {
+      "cartesian": { "label": "Cartesian", "tMin": 1e-5, "estimator": "best", "source": "n27 §5" },
+      "internal": { "label": "internal · unit spread", "tag": "C3", "tMin": 0.01, "estimator": "best", "source": "n27 §5" },
+      "whitened": { "label": "whitened two-block", "tag": "C1", "tMin": 0.01, "estimator": "best", "source": "n27 §5" }
+    },
+    "best": {
+      "cartesian": { "bond": 0.0004, "angle": 0.05, "torsion": 0.08, "rg": 0.47, "longrange": 0.44, "contacts": 0.38, "endtoend": 0.45, "tic": 0.36 },
+      "internal": { "bond": 0.26, "angle": 0.35, "torsion": 0.35, "rg": [0.27, 0.28], "longrange": 0.24, "contacts": 0.23, "endtoend": 0.18, "tic": 0.49 },
+      "whitened": { "bond": 0.26, "angle": 0.33, "torsion": 0.29, "rg": 0.35, "longrange": 0.33, "contacts": 0.31, "endtoend": 0.31, "tic": 0.46 }
+    },
+    "block": { "rg": 0.42, "longrange": 0.37, "contacts": 0.33, "source": "lab 2026-11-16 (block alone, lower bounds)" },
+    "c3RgFourWindows": [
+      { "value": 0.19, "estimator": "first order (lab 11-18)" },
+      { "value": 0.23, "estimator": "weaker estimator (n27 §3)" },
+      { "value": [0.27, 0.28], "estimator": "best envelope (n27 §4–5)" },
+      { "value": 0.30, "estimator": "linearised through the decoder (n27 §3)" }
+    ],
+    "wall": { "t": 0.001, "note": "a wall sharper than ≈ 0.1 Å needs a level near 0.001 or below", "source": "#1101, extrapolated" },
+    "inset": { "chroma": 0.0032, "matchedCovariance": 0.0049, "source": "#1099" }
+  }
+}

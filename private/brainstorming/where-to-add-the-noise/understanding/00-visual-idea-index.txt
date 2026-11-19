@@ -1,0 +1,232 @@
+===== a1-anim-main
+ - One ruler for everything: Euclidean arbitrariness, computed :: Cartesian distance ranks configurations against physics. A tiny bond stretch looks 'close' but is expensive, a large torsion looks 'far' but is cheap, and the straight-li
+ - Straightening the torsion orbit, and geodesic noising you can break :: The wδ idea: under a well-chosen metric or feature map, curved physical motions (torsions) become straight lines. Using the metric directly on ℝ³ᴺ needs a geodesic ODE so
+ - The noise clock per mode: a destruction raster :: Generalize Problem 1 from 2 modes to the full spectrum. Under flat noise every mode has its own readable window on the σₜ axis, spread over decades; G = K stacks all wind
+ - Same noise, two rulers :: The same random draws mapped through the flat metric and through G⁻¹ = K⁻¹. Flat noise shreds the bond while the torsion barely moves; metric noise moves every mode in pr
+ - Range and order: readable windows and loud collective modes :: Whitening (G = K) aligns all windows, which loses the coarse-to-fine order. The result: BBA bonds improve while global structure suffers. Ordered internal coordinates fix
+ - The spring metric is the Hessian at rest (pullback assembly) :: For a harmonic pair network at rest, K = Jᵀ W J exactly, where J is the Jacobian of the pair distances and W = diag(k_ij). So the spring pullback metric is G = K at rest 
+ - Where the springs come from: trajectory, quantum chemistry, transferable model :: The same spring-metric form with three sources of constants. Comparing them shows what each source knows about stiffness.
+ - Report cards and simulation consistency :: ALDP5 looked good across the board. On BBA bonds improved strongly but global structure did not. Simulation and iid–simulation consistency are checked by running dynamics
+ - One wrong ruler, seen from both sides (covector vs vector) :: Reconciles Part 1's Problem 3 (stiff score errors over-weighted ×κ) with the later 'the loss does not see stiff modes': covector components scale as 1/σ and vector compon
+ - The project's evolution map as the spine :: One recurring map orients the viewer: each approach, why it looked promising, why it failed or helped, and what question it led to.
+===== r6-range-and-order
+ - The erasure clock :: Range and order at a glance: where each property is half erased relative to the trained band.
+ - Forward destroyed = backward decided :: Readability equals the fraction already decided during exact generation, so the erasure order is the generation order.
+ - Spectrum fan and the whitening slider :: Whitening equalises all linear modes and destroys the order; a partial exponent keeps it.
+ - Two dials of the two-block map :: γ sets when collective features are erased, channel variance v sets when bonds/angles are erased, independently.
+ - Dose-response of the order dial :: Molecular size follows the order monotonically, but populations and torsions do not; windows understate the effect.
+ - Lever arm and anti-order :: A tiny torsion change swings distant beads, so internal coordinates erase chain geometry before the torsions that build it.
+ - The constraint split :: In a redundant chart the louder block leaves the correction to the quieter one; a natural loud block pulls the internal chain toward the size it decided early.
+ - Same area, different profile :: No chart changes the total information about a structure; it moves where in noise the training signal sits and how large its share is.
+ - Block size sweet spot :: Two loud vectors suffice; more add constraints and input channels without adding order and cost local accuracy.
+ - The chain follows the block on the reverse path :: The loud block decides size first; the rebuilt chain locks onto it only below t≈0.2.
+ - Two halves, one model :: Every earlier model got either local or global structure right; ordered internal coordinates get both, robustly across budgets.
+ - Global structure lives in the torsions :: Moving only the torsions at low noise fixes most of C3's size error at zero local cost.
+ - What the loud block cannot supply :: Order and redundancy do not give a wall, handedness, free kinematics or sharp soft forces.
+ - Coordinate versus relation (skeleton and arrows) :: Readable is not learnable: a property becomes accurate when it is a coordinate of its own, not when it is a relation between noisy coordinates.
+ - Opening the readability estimator :: The probe is an exact posterior mean over the training bank and needs temporal-neighbour exclusion to be honest.
+ - Volume term correction for forces :: A wrong volume formula created a spurious inward force; corrected, the loud model's force field is much closer to the data size, though all models still drift.
+===== a2-anim-pr3-videos
+ - Readable windows: a Gantt chart of when noise erases what :: Range and order become one picture. Each feature's readable range is the σ-span where it is partly but not fully erased, and the left-to-right order of the spans is the g
+ - Noise eats the spectrum :: Flat noise erases a molecule's modes in stiffness order, spread over decades of σ. A thermal metric erases them all at once. Ordered internal coordinates with a loud bloc
+ - Same molecules, three rulers (Euclidean arbitrariness) :: Cartesian distance is one arbitrary ruler among many. Thermal units and covariance weighting can reverse which configurations count as 'close', so the choice of metric is
+ - Why wδ noising needed geodesic ODEs, and why embeddings avoid them :: A metric on configuration space makes even noising a geodesic or Laplace–Beltrami problem (drift, volume, sensitivity that grows like sinh). In Euclidean feature space z 
+ - Straightening a bent cloud, and where it must fail :: wδ and learned warps aim to straighten the data manifold. Where the target metric is flat, one map can do it exactly. Where it is curved, every invertible Euclidean warp 
+ - The spring metric is a pullback :: Spring-like features φ_ij = √k_ij (d_ij − d⁰_ij) give DφᵀDφ ≈ K, delivering Part 1's promised 'G ≈ K' with known forward noise in feature space.
+ - Ordered internal coordinates as conditional whitening :: Scaling each internal coordinate by its thermal width straightens the stiff conditionals while the soft and loud block keeps its structure. The coupling survives in the J
+ - What a noisy BBA still knows :: At intermediate σ a noisy protein still determines its fold but not its bonds; later the fold also dissolves. This is exactly what the model must learn at each noise leve
+ - The loss sees only what the noise keeps :: The KL flow identity ties the loss norm to the noise covariance, and a loss cannot recover information the forward process erased. Misweighted stiff errors and early eras
+ - Evolution verdict board :: The project's history reads as claims with honest statuses: wδ tried (numerical, sensitivity and cost problems), stiffness rationale derived, ALDP5 embeddings good, BBA m
+===== r7-current-frontier
+ - Both scales at once: the map of 22 BBA models :: Every earlier construction got one half of BBA right (local geometry or global size); ordered internal coordinates sit alone near the corner where both are right, and the
+ - The erasure timeline (readable windows) :: Cartesian noise has order without range, internal coordinates range without order; the loud block gives both; EigenFold and Chroma fall inside the same account.
+ - The loudness ruler :: A feature's erasure time is a function of one number, its loudness; the loud block is the only thing louder than torsions, contacts are the quietest feature of the intern
+ - Anti-order in a chain :: Internal-coordinate noise destroys the fold before the turns that build it, because long-range geometry is a product of many torsion phases (readability r^j).
+ - Who corrects whom: the constraint split :: A redundant block creates constraint directions; the louder block leaves the correction to the quieter one, so a size decided early in the block is imposed on the chain.
+ - Generation decides size first (reverse-path gauges) :: In the ordered model the block's size is settled early and the rebuilt chain falls in line around t = 0.13, as the chain model predicted; population handedness is settled
+ - The phantom spring: a wrong volume term :: One wrong determinant in the score-to-force conversion made the force field compact the protein; with the immersion term the size error at 100 ps fell fourfold.
+ - Blur versus wall: the read-out squeeze :: No single noise level gives both a sharp excluded-volume wall and a readable size balance: torsion blur moves distant beads through their lever arm.
+ - Two errors that cancel: wall without and with a size term :: Forbidding overlaps unmasked a swelling the overlaps had been holding back; a weak size term (0.16 kT per A) cancels it.
+ - Use the six discarded numbers: rebuilds compared :: The generated loud block carries correct global information the internal-only decoder throws away; a joint fit plus a hard core gives Cartesian-level size, internal-level
+ - The drift that does not stop :: Every force field compacts the molecule over hundreds of picoseconds; fixes lower the curve but have not yet flattened it.
+ - The handedness detective (waterfall) :: The mid-size handedness deficit is neither in local shape nor in any single distance or side; it is a relative twist of the chain's two halves, a high-order feature for i
+ - Why two modes, and they are Rouse modes :: Two modes carry 96% of the size response and are the only modes louder than a torsion; their directions are fixed cosine patterns of the chain graph.
+ - Information moves, it is not created :: The total signal for the chain's collapse is identical in both charts (0.0766 nats); the loud block moves it to high noise where nothing else competes for the loss.
+ - The count-dependent floor :: The ScoreMD paper's PMF error falls roughly as 8,000/count, so a model score means nothing without its sample count.
+===== r5-information-geometry-retention
+ - The lag dial :: One slider τ turns the step metric from flat through the within-basin thermal metric to global whitening, and sets the order in which noise erases modes; γ = 1/(D₀τ) is t
+ - Clocks of a dipeptide :: Five decades of time scales decide what a 1 ps step sees: bonds saturate, ψ covers only 5%.
+ - Three rulers from one trajectory :: Thermal stiffness, the inverse lag covariance and predictive Fisher information differ: the first magnifies bonds, the last forgets them, and both short-lag versions are 
+ - Λ_t: one matrix, four problems :: Denoiser conditioning, E4, sampler stiffness and posterior splitting are all eigenvalues of the whitened posterior covariance.
+ - What the noisy molecule still knows: four distinctions and the r² law :: Different physical distinctions die at different noise levels. A width retains the square of its mean's fraction, and degree-j products retain r^j.
+ - Basin membership as a histogram :: Retained basin information is the normalized spread of posterior membership probabilities, R_B = Var(q_t)/(w(1−w)).
+ - Where the training signal lives :: The score feels a distinction exactly where its information is being destroyed. The total is fixed; only its placement in noise is designable.
+ - The plot twist of 5 November :: The 100 ps warp's fast torsion learning came from Gaussianizing the slow modes, not from synchronized erasure.
+ - Rare basins: invisible to variances, limited by visits :: αL barely changes variances, and 37 visits cap any estimator at order-one relative error, whatever the metric.
+ - Efficient loss metrics stretch barriers :: The metric that makes score matching efficient for basin weights lives at the barrier, so it cannot be a noise metric.
+ - Destroyed forward, decided backward: range and order :: A good process keeps every feature readable inside the trained range and erases global shape last.
+ - Design-space map of noising processes :: Range and order are two separate axes; published processes and project candidates occupy different corners.
+ - Order dial vs lag dial :: Partial whitening λ^{1−γ} and the thermal-metric lag are two versions of one dial that compresses the spread of erasure levels. On BBA the trained size error follows it.
+ - Anti-order in internal coordinates :: Products of many torsion phases are erased first, so internal coordinates lose global shape before the torsions that build it.
+ - Same metric, different retention :: The channel (map plus noise), not the pullback metric, sets what survives noising.
+ - Present but not usable :: Information can survive yet stay inaccessible to a finite network. Maps learned for predictability speed up early learning, then everything converges.
+ - Probe calculator explorable :: Under the project VP clock, any linear feature's readable window follows from its variance in noise units.
+ - From E4 to range and order :: The design goal moved from 'erase everything together' to 'everything readable, coarse erased last'.
+===== r1-wdelta-era
+ - Collisions and flat clouds are infinitely far (the odometer) :: Euclidean distance to a degenerate configuration is finite; wδ distance diverges logarithmically because log det G → −∞, so the metric's barrier sits exactly where near-p
+ - Expensive thickness, cheap bending :: Near a plane the metric is both huge and nearly singular: one determinant-sensitive eigenvalue ~e⁻², a bending eigenvalue ~e², condition ~e⁻⁴. This is the root of stiff g
+ - The scale–shape cylinder :: Dilation is a straight line in feature space, so wδ splits exactly into a flat log-scale axis z and a curved shape factor. z advances in closed form along any geodesic, w
+ - What one noised sample costs :: Flat diffusion noises in one line; intrinsic wδ diffusion needs an eigendecomposition-based frame, many Verlet sub-steps with a dense horizontal solve each, repeated for 
+ - The clock that ran the wrong way :: On the exact scale coordinate, the configured one-kick 'ou' forward has a mean multiplier that crosses zero and goes negative, which no OU process can do. The reverse sam
+ - Running uphill: zero-score reversal :: Reversing a confining forward negates the confinement. Without the right score, the reverse walk climbs out of the well and, on wδ, marches into the near-planar stratum e
+ - Step selection is not error control :: A fixed-step integrator with a length-based step count silently under-resolves stiff but well-posed directions. Endpoints are finite but geometrically impossible (scale o
+ - The transpose bug: invariants beat parity :: Swapping spatial indices inside the metric's 3×3 blocks broke positive semidefiniteness and the rigid-motion kernel. The JAX port and the reference implementation agreed 
+ - Mirror images and the reflection quotient :: Quotienting by E(3) identifies x with its mirror, but the sampler must emit an oriented representative. Alignment reflected 19.52% of real frames, so an error appears wit
+ - The phantom bead and what it really changes :: Appending a virtual Cβ fixes conditioning but changes the geometry: new distances, a different dilation constant, physical planarity reachable at finite augmented distanc
+ - Finite is not correct :: Once the integrator fixes made sampling ~100% finite, the distribution was still badly wrong. The blocker moved from numerics to the forward law, labels and prior.
+ - The moving baseline (scoreboard over time) :: The early wδ-over-flat advantage depended on a defective flat stack. Fixing the flat target bug and reproducing ScoreMD-native removed the comparative case.
+ - Same metric, two machines :: wδ itself was not the whole problem. Run as an embedding (noise in the flat feature space with a closed-form VP, project back), it trained at Cartesian-like cost and gave
+ - Did wδ remove stiffness? :: Judged by the question that ended the era (does the metric equalize thermal stiffness?), wδ at δ=1 is worse than flat on ALDP5 because the log-det channel dominates small
+ - Geometry-native reversibility (cold-prior Metropolis) :: Exact isotropic geodesic proposals are volume-reversible through Liouville flow and time reversal, so no Jacobian correction is needed. Adding one changed the target, eve
+===== r3-embeddings-pullbacks-aldp5
+ - Lift, noise, project :: Diffusing in a flat feature space gives metric-shaped noise on molecules with an exact Gaussian kernel: thin along the stiff bond, wide along the soft rotation.
+ - You cannot flatten an orange peel :: A flat chart of equal dimension must distort a curved metric by at least Kρ²/12, and the error grows with region size.
+ - Curvature landscape of the ALDP5 torsion torus :: ALDP5's soft space is mildly curved with both signs (total curvature 0 by Gauss–Bonnet), so one flat chart is off by a few to about 20% over the populated landscape.
+ - Nine rulers: when noise erases what :: Under flat VP noise the nine ALDP5 directions are erased over a decade of noise time, and the stiffest three disappear below the production noise floor. Metric-shaped fea
+ - Why the production-floor flat model makes bonds too rigid :: If the smallest training noise is wider than a bond, the ideal denoiser averages and narrows bonds by w/√(w²+s²); the error grows with training.
+ - The learning-curve race :: Stiff modes are learned 10–100× sooner in metric-shaped coordinates; torsions are not.
+ - One model, two uses :: Flat diffusion cannot get bonds and torsions right at one noise level; metric-shaped coordinates can, so the same weights work both for iid sampling and as a force field.
+ - Force check without reference forces :: Stein's identity −E[(g·e)(e·(u−ū))] = 1 tests each direction's restoring strength. Flat production forces are 3–5× too soft on bonds; spring and learned forces are within
+ - Equivariance makes the region global: the bond-orientation sphere :: An equivariant flat map must cover every bond orientation, a sphere about 6 thermal widths in radius with Kρ²≈π², forcing 14–56% metric error. A curved S²×R target gets 2
+ - Quantum springs: stiffness from one calculation :: A single electronic-structure Hessian predicts bead-level thermal widths without any MD, and combining references removes most local anisotropy.
+ - The conditioning ladder, one protocol at a time :: Maps differ by orders of magnitude in local anisotropy. Each κ is protocol-specific, and the κ ranking does not predict generation quality.
+ - Redundancy converts stiffness / the BBA scale bar :: Extra feature dimensions push stiffness into normal directions, where the score α/σ diverges. A single global RMS normalization squashed BBA spring channels below the sma
+ - A map that never saw chemistry finds the bonds :: The learned warp, fitted only to 1 ps steps, magnifies exactly the bond and angle gradients and shrinks the torsions.
+ - Map zoo explorable :: Many routes to the same stiff-mode benefit, differing in what data they need, whether they are alignment-free, and how they fail.
+===== r4-bba-scaling-learned-maps
+ - The lens that makes every step round :: A flow learned only from trajectory steps makes thermal fluctuations isotropic and rediscovers bonds and torsions without chemistry.
+ - Noise damage race :: Flat Cartesian noise destroys bonds 8–9× earlier than torsions; noise in the learned coordinates destroys all groups together.
+ - The floor that narrows bonds :: If the smallest trained noise is larger than a bond's width, the final denoising returns a conditional mean, and bonds come out about half as wide; more training makes th
+ - The loss is flat but the bonds still improve :: The noise-prediction loss weights noise levels by how often they are sampled. The stiff band σ≈w is about 6% of training, so a 23% → 5% bond-width error changes the loss 
+ - Turning the lag knob :: The lag of the fitted steps decides which modes count as stiff and in which order noise erases them. The 1 ps metric weighs ψ 19× stiffer than its equilibrium spread.
+ - Rescaling is not the trick: Gaussianization is :: The 100 ps warp's 100-update win comes from making the slow modes nearly Gaussian, not from synchronized rescaling.
+ - Same maps, new molecule (5 → 28 beads) :: On BBA the warps learn the slow coordinates best and the springs the local geometry; no map gets both.
+ - The 2×2 of failure (Sprint 12 first chunk) :: On BBA, local and global quality split across coordinate systems: internal coordinates are local-good/global-bad and Cartesian is global-good/local-bad, while springs, wh
+ - Springs under water :: One global RMS divisor (27.1 on BBA vs 1.31 on ALDP5) pushes every spring channel (s.d. 0.037) below the smallest training noise (0.045), so bonds are never resolved in t
+ - Noise that leaves the molecule :: With 3,303 invariant features for 78 shape directions, most Gaussian noise is normal to the molecular image. The network must learn a diverging normal stiffness α/σ (22 a
+ - The chain that collapses :: A score base can be right locally and wrong collectively. Freezing bonds and angles under an isotropic Gaussian pull halves the chain, while a covariance-matched Gaussian
+ - A turning bond looks compressed :: Local covariances built from straight chords mistake bond rotation for bond compression, so a metric fitted to them treats bonds as soft.
+ - Good conditioning, bad molecules: the trade-off line :: Better local conditioning of a learned map does not give better molecules. On BBA every local variant moves along one line: better size, worse bonds, angles and collision
+ - Global shape is a sum over distant pairs :: Rg² is a triangular-weighted sum of bond-vector dot products. The excess size lives in pairs at least 11 apart (92%), which local marginals cannot fix.
+ - Force panels measure blur :: Reading forces at t=0.05 blurs Cartesian BBA by about 1.09 Å per coordinate but an internal bond by about 0.01 Å, so every Cartesian model scores about 1.1 Å bonds regard
+ - Readable windows (bridge to range and order) :: What matters is when noise erases what. Cartesian has order without range, and unit-spread internal coordinates have range without order.
+===== r2-stiffness-what-we-want
+ - Nine rulers in the fog :: Under the real trusted VP schedule, flat noise erases every ALDP5 bond before the trained range even begins. Metric-shaped noise erases all nine modes together.
+ - The loss never sees the bonds :: Makes the user's phrase literal: the share of training that can read each mode under the trusted schedule.
+ - One score, three faces :: Covector (pull), Riemannian (move) and whitened (thermal units) carry the same information. Sizes and gains are two different problems, and raising the index fixes only t
+ - The pairing dial and the training valley :: Gradient descent feels the stiffness spread twice, as input variance times loss weight. Only thermal units in and out turn the valley into a bowl.
+ - Pull versus move on a four-atom chain :: The covector is a local pull; the Riemannian score is the collective Newton/Hooke move of the spring network (dense Green's function).
+ - The right ruler changes with the noise level :: Under flat noise the data ellipse rounds out as noise grows. A fixed metric helps at low noise and hurts at high noise; G_t follows the data.
+ - What the samples feel :: Whatever the sampler's preconditioner, a constant score error δ shifts the generated cloud by Σδ with KL ½δᵀΣδ. Equal relative errors in soft and stiff modes distort mole
+ - The flat force dilemma :: Reading forces at small noise trades bias against variance per mode. Flat noise puts the stiff and soft optima κ apart; synchronized (magnified) noise escapes this.
+ - Why the ruler must turn with the bond :: A constant equivariant metric is A⊗I₃ and cannot be stiff along a bond but soft across it. A stiffness metric must rotate with the bond, which adds a Jacobian term unless
+ - The spring metric is a cone, so embed it :: A stiff radial ruler with a soft angular ruler is curved. Flatness requires (d√B/dr)² = A, so no equal-dimension flat chart reproduces the spring metric; extra dimensions
+ - What no constant metric can fix :: Linear maps never change the barrier-to-basin curvature ratio of a double well; only noise, or a nonlinear transport using global density knowledge, does.
+ - Density and force disagree :: A model can be better in density and worse in force, because force error weights stiff modes. This is a toy echo of #603's +13.8–27.8% force MSE alongside better populati
+ - Same metric, different difficulty: line vs helix :: Equal pullback metric, rank and dimension do not imply equal denoising difficulty. Global geometry of the noisy image (aliasing between turns) sets the posterior covarian
+ - Redundant features move stiffness into the normal directions :: Redundancy does not remove stiffness; it converts finite tangent stiffness into normal stiffness α/σ that diverges as noise falls.
+ - Right balance, wrong scale :: The condition number is scale-free, but resolution is not: rescaling every channel can push a perfectly balanced map below the noise floor.
+ - One force for every metric :: A metric changes the vector form of the score and the volume, never the clean force. Volume terms are exact and dangerous to omit.
+ - Measuring the metric right :: Equilibrium widths and short-lag steps measure different things. A correct thermal metric can look terrible on step increments.
+ - Scoreboard of the era :: What stiffness removal fixed and what it could not, ending at the 2026-11-14 decision.
+===== a3-anim-side-videos
+ - Same molecules, two charts :: The Euclidean metric is a choice of labels. The same Cartesian step is a tiny bond change and a large torsion change, so coordinate differences are not distances for mole
+ - The readable window :: A feature stays readable while the noise sd is smaller than its thermal width. The same noise level is many sd for a bond and a fraction of an sd for a global mode.
+ - The erasure clock as a reveal :: First measure when noise erases each feature, then paint the map. The picture is a consequence of the measurement: half-erasure times sorted by λ.
+ - Range and order as threads across charts :: Cartesian coordinates give order without range: bonds are erased at about t = 0.0004, below t_min. Plain internal coordinates give range without order (anti-order). Order
+ - Stiffness: no single clock serves stiff and soft modes :: Euclidean noising erases stiff modes almost at once and soft modes late, and the loss barely sees the stiff ones. A metric that equalises the erasure times serves both.
+ - Embedding and pullback morph :: In good feature coordinates the metric becomes flat, so the forward process has a closed form. Ellipses in raw coordinates become circles in feature space.
+ - The wδ era: geodesic noising vs closed form :: Integrating the metric directly required geodesic ODEs just to add noise, which was slow and sensitive. An embedding gives the one-line forward process α y + σ ε.
+ - Loud collective modes and the constraint split :: With a loud block the global size is decided early, and the predictable correction splits L²/(1+L²) against 1/(1+L²), so the louder block hands the correction to the chai
+ - Diffusion time as the vertical axis in 3D :: Turning the relabel trick onto noise time makes each feature's readable band a slab in a block. A noising trajectory is a worldline that leaves the slabs in order.
+ - Whitening exponent sweep :: Partial whitening (γ from 0 to 1) trades bond accuracy against global shape; the measured curves show where the sweet spot lies.
+ - Force-field extraction as a balance :: At small noise the score is a force. The balance plot of 'two answers to one push' shows consistency, and the soft-force error grows like 1/σ.
+ - The project's evolution as a chain :: One continuous argument: wδ → stiffness → embeddings → ALDP5 successes → the BBA surprise → learned maps → range and order → ordered internal coordinates plus loud modes.
+===== r8-systems-data-eval
+ - Five beads out of twenty-two :: ALDP5 keeps C, N, Cα, C, N of the 22-atom dipeptide. Its whole shape is 4 bonds, 3 angles and φ/ψ (9 = 3n−6).
+ - A ladder of time scales :: Bonds relax in under 1 ps, φ libration in about 10 ps, the αR↔β hop in 100–200 ps and the αL hop in 5–20 ns. BBA frames are 200 ps apart over 325 µs, and the simulations 
+ - The rare basin is a barcode :: αL is visited in long, rare stretches: about 37 visits per 250 ns, τ ≈ 900–1,300 ps, ESS 96–139. Its populations of 3.2, 1.6 and 4.1% differ between trajectories, so no m
+ - Meet BBA: a real folding trajectory :: BBA has a hairpin (beads 0–12) and a helix (beads 14–25), and a wide size distribution (Rg 8.37/9.89/15.30 Å quantiles, folded share 0.194). Global structure is what make
+ - The noise ruler :: The same diffusion time t means very different physical blur in different coordinates. Cartesian BBA bonds are erased below t ≈ 4e-4, which covers 0.04% of training times
+ - Erasure order: readable windows :: Cartesian noise erases features fine-to-coarse over three decades (bond t_half 0.0004, Rg 0.47). Internal and whitened coordinates erase everything in one band near 0.26–
+ - Why the flat production floor over-sharpens bonds :: Tweedie denoising with leftover noise s shrinks a width w to w/√(w²+s²). The prediction is 0.39–0.46 and the observation 0.44–0.53, and the error grows with training.
+ - Learning curves you can watch (ALDP5) :: Spring and learned coordinates get bonds right about 100 times sooner, while torsions are learned at similar speed.
+ - Relaxation from β :: A force field can pass a local force check and still have the wrong landscape: flat low floor overshoots to 61%/91% αR and one wδ seed stays stuck.
+ - Floors depend on how many molecules you draw :: JS and PMF floors fall roughly like 1/N (N×PMF ≈ 8,000 on BBA), so numbers at different counts cannot be compared. At 100k the paper-PMF floor (0.080) exceeds the paper's
+ - Local against global :: Internal coordinates get local geometry, Cartesian models get size, and only the loud-mode internal model gets both. ScoreMD trails on local geometry.
+ - Size is long range :: Rg² is a weighted sum of bond-vector correlations, and C3's error lives in pairs at least 11 apart (92%). That is invisible to per-bond metrics.
+ - What each metric looks at :: One generated set gives six readouts that can disagree. Example: the production-floor flat model looks right on the TIC plane while its bonds are too narrow.
+ - Forces drift :: Every BBA force field compacts over 100 ps. The internal models drift least, from 0.2–0.5 Å at 10 ps to 0.7–1.4 Å at 100 ps.
+ - Mirror images and handedness :: ALDP's αL is a real basin, not a mirror image (handedness gap 0.002–0.004 ≈ floor). Compact BBA is strongly handed (P(χ>0)=0.17 for Rg<8.5 Å), and generated loud-mode mol
+===== g3-literature-positioning
+ - One spectrum, two pulls :: Stiffness removal wants a flat variance spectrum; noise order wants a steep one; the final design flattens the stiff block and keeps two global modes loud.
+ - The stretched bowl :: Gradient descent crawls along narrow directions; in thermal units it takes one Newton-like step.
+ - Partial whitening sweet spot, two mechanisms :: Both an image/GMM study and the BBA study find full whitening worse; Ahamed explains it by inverse amplification, the project by erased order.
+ - Readable-window lane chart of every process :: Cartesian has order without range, C3 range without order, EigenFold even more order, Chroma partial order, and internal coordinates plus a loud block have both.
+ - Decision windows as information bumps :: Each linear feature has a 1.2-decade decision window centred at SNR=1/λ; Pan's information density equals ½R; order needs loudness ratios above 16.
+ - Ruler against bond :: The trusted flat schedule's smallest noise is wider than a bond, so bonds are never trained; thermal-width internal channels fix this.
+ - Heat equation on images, chains and lags :: IHDM blur, EigenFold harmonic diffusion and lag-shaped noise are one mechanism: fast-relaxing modes are erased first.
+ - Equal SNR: images forgive, proteins don't :: Losing the hierarchy barely changes image FID but swells a protein.
+ - Noise, then regenerate; clone, then commit :: The literature's probing protocols reveal when a molecular model decides its size.
+ - Anti-order: the fold dissolves before its joints :: In internal coordinates, chain geometry built from j torsions keeps only r^j of its readability.
+ - The constraint seesaw :: In a redundant chart, the quieter block is the one corrected, so a loud block imposes its early size decision on the chain.
+ - Two loud vectors are enough :: Only two modes are louder than a torsion, and they carry 96% of the size response; more vectors only add constraints.
+ - Same information, different profile :: No chart changes the total training signal for a structure; it moves where along the noise levels that signal sits.
+ - Semantic-first in images, loud-first in proteins :: An appended global channel with a leading schedule is an image-domain design; the molecular loud block is its structural twin.
+ - Metric zoo: what each geometry calls small :: Euclidean, wδ, R-DM and thermal metrics weight bond versus distant-pair changes very differently.
+ - Readable is not learnable :: Readability is necessary, not sufficient: explicit coordinates matter.
+ - Positioning map :: Locate each work by what it reshapes (network vs process) and whether it equalizes or keeps spectral spread.
+===== g4-number-canon
+ - The κ ladder :: κ is not one number; values from 1.55 to 1.5×10⁵ belong to six definitions and three data sets
+ - Noise ruler with t scrubber :: σ(t) is dimensionless; its size in Å depends on what is noised
+ - Same word, four windows :: Readable windows depend on the estimator and are lower bounds
+ - Exact readability curves and the γ dial :: For linear features only the spectrum matters; whitening collapses order to t½ = 0.26
+ - Idealized vs measured basin spectrum :: The textbook ×20 (√κ) is a model; one real ALDP5 basin gives ×14
+ - Three trajectories, 37 visits :: Same visit counts, different dwell times; one trajectory pins αL to about ±50%, not ±100%
+ - Budget clock :: BBA conclusions hold from 2.6% to 100% of the schedule; most stops were at near-peak learning rate
+ - Where to read the force :: The two conventions differ by α_t²; both carry the blur bias; the volume term matters far more
+ - Two ALDP5 data sets :: Implicit-solvent torsions move faster and rare-basin populations differ; numbers from the two sets must not be mixed
+ - SNR at the floor and the shrinking bond :: At t = 0.01 bonds have SNR < 1 under every convention, so the final Tweedie step shrinks them
+ - Training share of windows :: A window only helps if training samples land in it
+ - Lag dial with ALDP5 time scales :: The metric's lag sets which modes are erased together; 1 ps covers 43% of φ's and 5% of ψ's variance
+ - Retention toy with computed half-points (and the 63% fix) :: Which observable goes first depends on the channel; variance and width fractions differ
+ - Leakage trap :: Temporal neighbours inflate readability; BBA '1 ps' frames are 200 ps apart
+===== g2-straightening-and-wdelta-arc
+ - The famous figure, with its missing baseline :: Diepeveen's AK interpolation looks convincing, but the plain Cartesian chord, never shown in the paper, is closer to the MD frames at every point
+ - Straight in which space? The projected feature chord :: A 'wδ-geodesic' is the straight line in log-distance feature space projected back onto realizable molecules; it is not an intrinsic geodesic
+ - Rank-1 is the data, not the metric :: Plain Euclidean shape PCA reproduces the 'dramatic dimensionality reduction' on both proteins
+ - What wδ really buys: short distances :: wδ's reproducible advantage is local: it keeps neighbouring beads apart where Cartesian chords collapse them
+ - The straightening cartoon, made exact :: In a Gaussianizing chart the valley is straight, the data are exactly Gaussian and the score is linear; in raw coordinates straight lines cut through improbable regions
+ - Gaussianize the slow modes :: The lever behind 100-update torsion learning is making the data Gaussian, not equalizing widths
+ - A unimodal latent meets a rare barrier :: Forcing a multi-basin density through a single-Gaussian latent smooths the rare αL barrier, as Diepeveen 2025's unimodal scope warns
+ - Erasure ladders across charts :: wδ keeps Cartesian's fine-to-coarse order but lifts everything into range except bonds; it is the only chart where the closest contact is readable far above the floor
+ - Mirror images: two charts, two blind spots :: Ordered internal coordinates see bonds but not contacts; wδ sees contacts but not bonds, which matches the registered-budget outcome
+ - The two walls :: The excluded-volume wall that internal coordinates cannot learn is built into wδ: a collision sits at infinite feature distance and the contact margin spans many noise wi
+ - The barrier that killed, the barrier that may save :: Diepeveen's completeness construction has two barriers: the planarity barrier broke intrinsic wδ on ALDP5, while the collision barrier is exactly the missing physics in o
+ - Equilibrium cannot know time :: A configuration-space metric cannot fix the time parametrization of MD; 'geodesic ≈ trajectory' needs a directed path
+ - wδ's afterlife scoreboard :: As a feature map wδ wins on global geometry and collisions and loses on local geometry and forces
+===== g1-origins-and-consistency
+ - The blur dial: a force read at noise level t is the force of the blurred molecule :: Reading the score at level t softens each mode's restoring force to its readable fraction r(t)=α²λ/(α²λ+σ²) and widens its simulated spread by 1/√r. Two For One's broad b
+ - ScoreMD's seesaw: one model, two uses :: Reading the force early breaks the landscape; reading it late breaks the bonds. FP+MoE balances the two at an iid price.
+ - Two horns of the flat dilemma on ALDP5, and the coordinate fix :: Without any FP term, each flat model fails one horn as a force field, while spring/learned coordinates pass both from a single read-out level.
+ - The diagonal: same weights, two uses :: Consistency means a model is as good as a force field as it is as a sampler. Flat models sit far above y=x; metric-shaped models hug it.
+ - The blind spot moves with the chart :: Each coordinate system has one property it cannot read at the trained noise floor: Cartesian loses bonds, internal coordinates lose contacts and the wall. The force field
+ - No sweet spot for a single read-out level :: Soft-force information from one level scales as σ² (error ∝ 1/σ), while contact blur grows with σ through the torsion lever arm. ScoreMD's FP loss exists to tie the level
+ - What a missing volume term does :: A missing or wrong Jacobian/volume term is indistinguishable from an attractive physical force.
+ - The compaction movie: a 100 ps number is a point on a drift :: Every BBA force field keeps shrinking the molecule. Internal coordinates are best but not stable, and the volume-term fix slows the drift without stopping it.
+ - BBA force-field leaderboard (with the honest asterisk) :: Internal coordinates keep bonds at the panel floor and the size closest to the data in dynamics. The Cartesian family keeps size better only in generation.
+ - The paper's metric and its sample-count floor :: PMF error depends strongly on the number of samples (floor ≈ 8,000/N). Our 100k-sample scores cannot be set against Table 1's 1.3M-sample values.
+ - Promise ledger: milestones that moved :: The original goals were renamed and re-ordered, not quietly dropped. Each has a dated fate.
+ - The bias–variance vise and the loss that cannot see bonds :: In Cartesian units, bonds demand tiny noise, which makes the soft-force target ~κ (≈920) times noisier. The denoising loss barely registers bond widths: about 0.009 exces
+ - Two densities from one model (Müller–Brown) :: A diffusion model defines a denoising density p(x) and a t≈0 Boltzmann density p0(x). Consistency means the two coincide.
+TOTAL 216

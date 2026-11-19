@@ -27,6 +27,7 @@ intuitive.
 | Part 0 · The geometry of shape space 1 | video, about 8 min | shape space: bundles, connections, curvature |
 | Part 1 · Diffusion in the right geometry | video, about 5 min | diffusion: stiffness and the metric |
 | Atlas · Why one chart is not enough | playable video (prototype), about 1.5 min | atlases: why one flat chart is not enough |
+| The Flipped Handle | playable video (probe), about 7.5 min | diffusion: where to add the noise (range and order) |
 | Torus flow, flattened | explorable | atlases: the same argument as a standalone page |
 
 **Videos** are narrated timelines with chapters, scrubbing and frame-by-frame
@@ -93,6 +94,38 @@ proofs are part of the thesis.
    instead of glued edges (46 s): mass piles against the walls and cannot go
    round, because a flat square has no hole to go around. At 61 s the viewer is
    invited to try it themselves.
+
+**The Flipped Handle** (probe of the "Where to Add the Noise" series, about 7.5 minutes)
+
+Five scenes from two planned episodes, joined by one control: the noise-shape
+exponent γ, which whitens the noise (λ ↦ λ^(1−γ)). The plan for the whole series
+is in `private/brainstorming/where-to-add-the-noise/programme.md`.
+
+1. **Nine rulers in the fog** (Episode 2, live). The nine principal modes of the
+   five-bead alanine-dipeptide backbone on one noise clock: under flat noise the
+   stiff ones are half erased below the trained floor, and five get under 1% of
+   the training draws. γ = 1 puts every mode on one clock.
+2. **The promise** (Episode 2). The same nine modes fade in unison; the four
+   effects of a stiffness metric, and why only the forward noise can synchronise
+   erasure.
+3. **The erasure clock** (Episode 5, live). Measured half-erasure levels of a
+   28-bead protein (BBA) for Cartesian, internal, whitened and ordered internal
+   coordinates: range (every local feature inside the training) and order (size
+   erased last). A probe finds where each chart knows its size but has lost its
+   bonds.
+4. **The handle, turned back** (Episode 5, live). BBA's 27 collective modes, the
+   same γ turned from 1 to 0, and the trained size error at the four exponents
+   that were trained: whitening everything is what erased the order.
+5. **Two loud modes** (Episode 5, live). The ordered design (109 features), its
+   two collective modes on a real molecule, the lane morph when the block is
+   added, and the registered result: inside the registered corner on one seed of
+   two. The mechanism is marked untested until test #1137 runs.
+
+Every number comes from a tested rig (`src/model/thesis`, tests in
+`tests/thesis`) or the evidence ledger (`src/data/thesis/ledger.json`), whose
+rows carry their budget, seeds, molecule count, floor and source. The data
+assets are rebuilt with `python3 -I scripts/data/thesis_mvp_assets.py --rg
+<riemannian-generative checkout>`.
 
 Each video runs in the browser as an interactive player with chapters, scrubbing
 and narration, and can be exported frame by frame to MP4. Everything is plain

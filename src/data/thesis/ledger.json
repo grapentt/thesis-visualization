@@ -1,0 +1,40 @@
+{
+  "schema": "thesis-ledger-v1",
+  "id": "A22-mvp",
+  "created": "2026-11-19",
+  "notes": "The MVP subset of the programme's evidence ledger: every trained or logged number the probe draws, with its budget, seeds, molecule count, floor and source. Transcribed from the programme's number canon (§7) and the understanding reports (r6, r7, g4), which cite the ML repo snapshot of 2026-11-19. Badges: M measured, D derived, D·model derived on a model, H hypothesis, S cited.",
+  "budgets": {
+    "50k": { "updates": 50000, "share": "2.6%", "label": "50k upd (2.6%)" },
+    "190k": { "updates": 190350, "share": "10%", "label": "190,350 upd (10%)" },
+    "full": { "updates": 1903500, "share": "100%", "label": "1,903,500 upd (100%)" }
+  },
+  "rows": [
+    { "id": "aldp5.widths", "value": [0.0252, 0.0294, 0.0419, 0.0543, 0.0654, 0.1234, 0.1851, 0.3452, 0.6631], "unit": "Å", "badge": "M", "def": "principal widths of the ALDP5 backbone (five heavy atoms), stiffest first", "system": "ALDP5 · mdshare traj 1", "source": "#768 evidence.json mode_std_A" },
+    { "id": "aldp5.pilotUnit", "value": 0.9418, "unit": "Å", "badge": "M", "def": "the noise unit of the ALDP5 pilots (one σ = 0.9418 Å)", "system": "ALDP5", "source": "g4 §3.3" },
+    { "id": "aldp5.ownUnit", "value": 0.267, "unit": "Å", "badge": "D", "def": "the backbone's own scale, with floor 10⁻⁵", "system": "ALDP5", "source": "r3 E19" },
+    { "id": "aldp5.bondHalf", "value": [0.003, 0.004], "unit": "", "badge": "D", "def": "a bond length (√2σ) is half erased at t ≈ 0.003–0.004", "system": "ALDP5", "source": "n21 Prop. 5" },
+    { "id": "bba.ratio.n27", "value": 1423, "unit": "", "badge": "M", "def": "largest / smallest Cartesian mode variance (note 27's print)", "system": "BBA", "source": "n27 §3" },
+
+    { "id": "g1057.rg", "value": { "1": [0.499, 0.514], "0.5": [0.187], "0.25": [0.12], "0": [0.081] }, "unit": "Å", "badge": "M", "def": "size error (Rg W1) of loud-block models at whitening exponent γ", "system": "BBA", "budget": "50k", "seeds": "2 seeds at γ = 1, one each otherwise", "N": 20000, "floor": 0.016, "source": "#1057" },
+    { "id": "g1057.torsion", "value": { "1": [9.7, 10.4], "0.5": [6.5], "0.25": [7.1], "0": [9.1] }, "unit": "°", "badge": "M", "def": "torsion error at γ", "system": "BBA", "budget": "50k", "seeds": "as g1057.rg", "N": 20000, "source": "#1057" },
+    { "id": "g1057.tic", "value": { "1": [0.107, 0.106], "0.5": [0.083], "0.25": [0.081], "0": [0.086] }, "unit": "nats", "badge": "M", "def": "population JS on the two slowest TICs at γ", "system": "BBA", "budget": "50k", "seeds": "as g1057.rg", "N": 20000, "floor": 0.037, "source": "#1057" },
+    { "id": "g1069.whisker", "value": [0.03, 0.09], "unit": "Å", "badge": "M", "def": "two-seed spreads of the 4- and 8-vector blocks: the seed-spread yardstick drawn on one-seed points", "system": "BBA", "budget": "50k", "seeds": "s0/s1", "N": 20000, "source": "#1069" },
+    { "id": "g1057.dose.rg", "value": [0.09, 0.28], "unit": "Å", "badge": "M", "def": "reverse dose: Cartesian pure modes, γ 0 → 0.5, size error", "system": "BBA", "budget": "50k", "seeds": "one seed", "N": 20000, "floor": 0.016, "source": "#1057" },
+    { "id": "g1057.dose.bond", "value": [0.013, 0.0046], "unit": "Å", "badge": "M", "def": "reverse dose: bond error, γ 0 → 0.5", "system": "BBA", "budget": "50k", "seeds": "one seed", "N": 20000, "source": "#1057" },
+    { "id": "n27.understated", "value": [0.1, 2.3], "unit": "", "badge": "M", "def": "γ 0 → 0.5 shrinks the Rg window by 10% and multiplies the size error by 2.3", "system": "BBA", "source": "n27 §7; #1057" },
+
+    { "id": "r1088.c3.bond", "value": [0.00032, 0.00034], "unit": "Å", "badge": "M", "def": "bond W1, internal coordinates at unit spread (C3)", "system": "BBA", "budget": "190k", "seeds": "s2/s3", "N": 100000, "floor": 0.0002, "source": "#1088" },
+    { "id": "r1088.c3.rg", "value": [0.455, 0.418], "unit": "Å", "badge": "M", "def": "size error, C3", "system": "BBA", "budget": "190k", "seeds": "s2/s3", "N": 100000, "floor": 0.006, "source": "#1088" },
+    { "id": "r1088.ordered.bond", "value": [0.00038, 0.00033], "unit": "Å", "badge": "M", "def": "bond W1, ordered internal coordinates (C3 + 2 loud modes)", "system": "BBA", "budget": "190k", "seeds": "s2/s3", "N": 100000, "floor": 0.0002, "source": "#1088" },
+    { "id": "r1088.ordered.rg", "value": [0.117, 0.091], "unit": "Å", "badge": "M", "def": "size error, ordered internal coordinates", "system": "BBA", "budget": "190k", "seeds": "s2/s3", "N": 100000, "floor": 0.006, "source": "#1088" },
+    { "id": "r1071.corner", "value": { "bond": 0.001, "rg": 0.11 }, "unit": "Å", "badge": "M", "def": "the registered 'both right' corner, fixed in advance", "system": "BBA", "source": "#1071", "declared_before": "2026-11-14" },
+    { "id": "r1141.rg", "value": [0.101, 0.097], "unit": "Å", "badge": "M", "def": "Rouse directions vs #1141's own fitted rerun: Rg W1 seed means", "system": "BBA", "budget": "190k", "seeds": "seed means", "N": 100000, "source": "#1141", "status": "NEW · UNREVIEWED" },
+    { "id": "r1141.ff", "value": [[0.35, 0.32], [0.26, 0.22]], "unit": "Å", "badge": "M", "def": "force-field size error, Rouse directions vs fitted modes", "system": "BBA", "budget": "190k", "seeds": "s2/s3", "panel": "force field, size error at 100 ps", "source": "#1141", "status": "NEW · UNREVIEWED" },
+    { "id": "n1137", "value": null, "unit": "", "badge": "H", "def": "order or correction? a whitened block keeps about half the gain (supports if 0.2 ≤ f ≤ 0.8 on both seeds)", "system": "BBA", "source": "#1137", "status": "DECLARED, NOT RUN", "declared_before": "2026-11-18" },
+
+    { "id": "n30.ideal", "value": [0.9, 0.066], "unit": "Å", "badge": "D·model", "def": "an ideal chain given only the |a₁| marginal: Rg W1", "system": "chain model", "source": "n30 §5" },
+    { "id": "n30.lengthKL", "value": [0.008, 0.063], "unit": "nats", "badge": "D·model", "def": "mode lengths vs a Gaussian 3-vector", "system": "BBA", "source": "n30 §5; bba_charts.json" },
+    { "id": "n30.rgKL", "value": 0.30, "unit": "nats", "badge": "D·model", "def": "standardized Rg vs a Gaussian", "system": "BBA", "source": "n30 §5; bba_charts.json" },
+    { "id": "n1057.align", "value": 0.88, "unit": "", "badge": "M", "def": "mode 1 aligned with the hairpin–rest separation", "system": "BBA", "source": "#1057 via r6" }
+  ]
+}
